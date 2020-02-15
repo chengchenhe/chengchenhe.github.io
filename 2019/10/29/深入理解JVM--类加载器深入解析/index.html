@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>深入理解JVM--类加载过程深入解析-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">深入理解JVM--类加载过程深入解析</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2019-10-29</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p><strong><em>JVM规范允许类加载器在预料某个类将要被使用时就预先加载它，如果在预先加载的过程中遇到了.class文件缺失或存在错误，类加载器必须在<font color=#00aeef >程序首次主动</font>使用该类时才报告错误（LinkageError错误）；如果这个类一直没有被程序主动使用，那么<font color=#00aeef >类加载器就不会报告错误</font></em></strong></p>
+<ol>
+<li><strong><em>Java虚拟机结束生命周期的几种情况</em></strong><ul>
+<li>执行了System.exit();方法</li>
+<li>程序正常执行完毕</li>
+<li>程序在运行过程中遇到了异常导致程序异常终止</li>
+<li>由于操作系统出现错误导致java进程终止</li>
+</ul>
+</li>
+<li><strong><em>Java虚拟机自带了以下几种加载器</em></strong><ul>
+<li><strong><font color=#00aeef >根（bootstrap）类加载器：</font></strong>该加载器没有父类加载器。根类加载器的实现依赖于底层操作系统，<font color=#00aeef >由C++实现</font>，属于虚拟机的实现的一部分；<strong>当JVM启动时，一块特殊的机器码会运行，它会加载由JAVA实现的扩展类加载器与系统类加载器，从而让整个加载过程能顺利运行，这块特殊的机器码就叫启动类加载器；</strong> 启动类加载器还会负责加载供JRE正常运行所需要的基本组件</li>
+<li><strong><font color=#00aeef >扩展（Extension）类加载器：</font></strong>他的父加载器为根类加载器。它从java.ext.dirs系统属性所指定的目录中加载类库，或者从JDK的安装目录的jre\lib\ext子目录（扩展目录）下加载类库，<strong>如果把用户创建的JAR文件放在这个目录下，也会自动由扩展类加载器加载。</strong> 扩展类加载器是纯Java类，是java.lang.ClassLoader类的子类</li>
+<li><font color=#00aeef ><strong>系统（System，App）类加载器：</strong></font> 也称为应用类加载器，它的父加载器为扩展类加载器。它从环境变量classpath或者系统属性java.class.path所指定的目录中加载类，它是用户自定义的类加载器的默认父加载器。系统类加载器是纯Java类    是java.lang.ClassLoader的子类 <strong><em>（可以通过修改java.system.class.loader变量来指定系统类加载器，而此时该指定的系统类加载器则会由默认的系统类加载器来加载）</em></strong></li>
+<li><strong>除了上面几种，用户也可以通过继承java.lang.ClassLoader类来自定义类加载器</strong></li>
+</ul>
+</li>
+<li><strong><em>类加载器的双亲委托模型的好处</em></strong><ul>
+<li><strong>可以确保Java核心库的类型安全：</strong> 所有的Java应用都至少会引用java.lang.Object类，也就是说在运行期，java.lang.Object这个类会被加载到Java虚拟机中；<font color=#00aeef >如果这个加载过程是由Java应用自己的类加载器所完成的，那么很可能就会在JVM内存中存在多个版本的java.lang.Object类</font>，而且这些类之间还是不兼容的，相互不可见的（下面所讲的命名空间）；借助双亲委托机制，Java核心类库中的类的加载工作都是<font color=#00aeef >由启动类加载器来统一完成，从而确保了Java引用所使用的都是同一个版本的Java核心类库</font>，他们之间是相互兼容的。</li>
+<li><strong>可以确保Java核心类库所提供的类不会被自定义的类所取代</strong></li>
+<li><strong>不同的类加载器可以为相同名称（binary name）的类创建额外的命名空间。</strong> 相同名称的类可以并存于Java虚拟机中，只需要用不同的类加载器来加载它们即可。不同类加载器所加载的类之间是不兼容的，这就相当于在Java虚拟机内部创建了一个又一个相互隔离的Java类空间，这类技术在很多框架中都得到了实际应用。</li>
+</ul>
+</li>
+<li><strong><em>命名空间</em></strong><ul>
+<li>同一个类只会被加载一次，但是如果<strong>同一个类被<font color=#00aeef >不同的且没有依赖关系</font>的类加载器加载（即所处的命名空间不同）</strong>，jvm就会认为是不同的类从而再次加载该类！</li>
+<li>每个类加载器都有自己的命名空间，命名空间由该加载器及其所有父类加载器所加载的类组成。<strong>即：子加载器可以访问父加载器所加载的类，但是父加载器无法访问子加载器所加载的类！</strong></li>
+<li><strong>不同的命名空间中的类是相互不可见的（除了上面讲的子类和父类关系的命名空间）</strong>，若一个类被不同的类加载器加载，即在不同的命名空间中，JVM也会认为在命名空间中是两个不同的类。</li>
+<li>在运行期，一个Java类是由该类的完全限定名（binary name，二进制名）和用于加载该类的定义类加载器（defining loader）所共同决定的，<strong>如果同样名字（即相同的完全限定名）的类是由两个不同的类加载器所加载，那么这些类就是不同的，即便.class文件的字节码完全一致，并且从相同位置加载也是如此。</strong></li>
+<li>在同一个明明空间中，不会出现类的完整名字（包括类的包名）相同的两个类</li>
+<li>在不同的命名空间中，有可能会出现类的完整名字（包括类的包名）相同的两个类</li>
+</ul>
+</li>
+<li><strong><em>上下文类加载器（ContextClassLoader）</em></strong><ul>
+<li>可以通过<font color=#00aeef >Thread.currentThread().getContextClassLoader()</font> 方法获取到当前线程的上下文类加载器。</li>
+<li><strong>线程上下文类加载器默认为系统类加载器(AppClassLoader)，但是可以通过Thread.currentThread.setContextClassLoader()方法去设置上下文类加载器。</strong></li>
+<li>在双亲委托机制下，类的加载时从下至上的。但是对于SPI（Service Provider Interface）来说，<strong>有些接口是Java核心库提供的，这些接口会由根类加载器去加载，但是这些接口的实现类却是来自不同厂商的jar包，而根类加载器显然不能加载这些实现类。</strong> 所以Java提供了上下文类加载器，使得<font color=#00aeef >父ClassLoader可以使用当前线程指定的上下文类加载器所加载的类，通过打破双亲委托机制实现了类的依赖。</font></li>
+<li>如果一个类由加载器A来加载，那么这个类的依赖类也会会由A加载器尝试加载（前提是该类没有被加载过），ContextClassLoader存在的作用就是破坏Java的类加载机制，<strong>当高层提供了统一的接口让低层去实现，同时又要在高层加载（或实例化）低层的类时，就必须要通过线程上下文类加载器来帮组高层的ClassLoader找到并加载该类</strong></li>
+<li>线程上下文类加载器一般的使用方式（获取–使用–<strong><em>还原</em></strong>）</li>
+</ul>
+</li>
+<li><strong><em>类的卸载</em></strong><ul>
+<li>当一个类被加载、连接和初始化后，它的生命周期就开始了，当代表该类的class对象<font color=#00aeef >不再被引用</font>，即不可触及时，class对象就会结束生命周期，该类在方法区内的数据也会被卸载，从而结束该类的生命周期；<strong>一个类何时结束生命周期，取决于代表它的class对象何时结束生命周期</strong></li>
+<li><strong>由Java虚拟机自带的类加载器所加载的类，在虚拟机的生命周期中，始终不会被卸载。</strong> Java虚拟机自带的类加载器会始终被虚拟机引用，而这些类加载器则会始终引用他们所加载的类的class对象，因此这些class对象始终可以被触及。<strong>所以，只有由用户自己定义的类加载器所加载的类是可以被卸载的</strong></li>
+<li>在类加载器内部实现中，用一个Java集合来存放所加载类的引用。另一方面，一个class对象总是会引用它的类加载器，调用class对象的getClassLoader()方法，就能获得它的类加载器。由此可见，<strong>类与类加载器是双向连接关系。</strong></li>
+<li>一个类的实例总是引用代表这个类的class对象，在Object类中定义了getClass()方法，这个方法返回代表对象所属类的class对象的引用。此外，所有Java类又有一个静态属性class，它引用代表这个类的class对象。</li>
+</ul>
+</li>
+<li>类加载器相应案例<br><img src="https://img-blog.csdnimg.cn/20191029181121125.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181131900.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181140201.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181146372.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181153976.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181203264.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20191029181210381.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/11/11/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            深入理解JVM--字节码文件结构解析</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/15/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%85%A8%E8%BF%87%E7%A8%8B/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--类加载全过程
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/11/11/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            深入理解JVM--字节码文件结构解析</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/15/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%85%A8%E8%BF%87%E7%A8%8B/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--类加载全过程
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

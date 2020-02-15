@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>新建博客过程总结-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">新建博客过程总结</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2019-07-26</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p>##前言</p>
+<p>折腾了接近2小时，终于把博客搭建好了((<em>^_^</em>)),当然在搭建的过程中也是遇到了不少的问题，<br>本想全部记下来的，但是中途不小心手贱关了一次cmd窗口=。=，好多错误和解决方法都没了，没关系，<br>剩下的还是可以记一下的…</p>
+<p>##没进入目标文件夹</p>
+<p>Commands:<br>  help     Get help on a command.  init     Create a new Hexo folder.  version  Display version information.<br>Global Options:<br>  –config  Specify config file instead of using _config.yml<br>  –cwd     Specify the CWD<br>  –debug   Display all verbose messages in the terminal<br>  –draft   Display draft posts  –safe    Disable all plugins and scripts<br>  –silent  Hide output on console<br>For more help, you can use ‘hexo help [command]’ for the detailed information<br>or you can check the docs: <a href="http://hexo.io/docs/" target="_blank" rel="noopener">http://hexo.io/docs/</a></p>
+<p>原因：没进入目标文件夹（部署博客时新建的那个文件夹），我的是blog。<br>解决：cd blog</p>
+<p>##hexo init出错</p>
+<p>FATAL ~\blog\ not empty, please run <code>hexo init</code> on an empty folder and then copy your files into it<br>FATAL Something’s wrong. Maybe you can find the solution here: <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">https://hexo.io/docs/troubleshooting.html</a></p>
+<p>原因：目标文件夹不为空<br>解决：hexo init 空文件夹名称<br>      cd 文件夹名称<br>      继续操作</p>
+<p>##hexo init时长时间不动，停留在某一处</p>
+<p>原因：网络问题<br>解决：科学上网或着傻傻的等=。=</p>
+<p>##ERROR Deployer not found: git</p>
+<p>原因：未知<br>解决：npm install hexo-deployer-git –save</p>
+<p>##hexo g出错，未配置身份</p>
+<p>如果在上传时失败并出现 please tell me who you are 类似子句，代表没有在git中配置身份<br>解决：右键-&gt;Git Bash Here gitconfig-&gt;$ git config<br>      $ git config –global user.name “xxx 配置名称<br>      $ git config –global user.eamil “<a href="mailto:xxx@xxx.com">xxx@xxx.com</a>“ 配置邮箱<br>      完成后可以用 $ git config -l(小写L)来检查是否成功</p>
+<p>##重温配置部署博客流程</p>
+<p>还记得的错误就上面那些了，为什么要手贱啊=。=，接下来总结一下具体流程</p>
+<p>0、打开cmd窗口（win键+X，点击运行）</p>
+<p>1、搭建环境<br>    1）、去官网下载node.js 网址：<a href="https://nodejs.org/en/，完成后可在cmd窗口中用" target="_blank" rel="noopener">https://nodejs.org/en/，完成后可在cmd窗口中用</a> node -v检查版本号<br>    2）、去官网下载git 网址：<a href="https://git-scm.com/downloads，完成后鼠标单击右键会出现" target="_blank" rel="noopener">https://git-scm.com/downloads，完成后鼠标单击右键会出现</a> Git GUI HERE 和 Git BASH HERE<br>    3）、在cmd窗口中输入 npm install -g cnpm -registry=<a href="https://registry.npm.taobao.org" target="_blank" rel="noopener">https://registry.npm.taobao.org</a> 安装淘宝镜像，之后一样用-v检查是否成功安装<br>    4）、在cmd窗口中输入 cnpm install -g hexo-cli</p>
+<p>2、创建博客<br>    1）、在cmd窗口中输入 hexo init blog 创建博客文件夹（默认地址在C:\Users\你自己的用户名）文件夹中<br>    2）、在cmd窗口中输入 hexo s 运行本地博客，此时在浏览器地址中输入 localhost:4000应会出现博客默认主页，确认无误后在cmd窗口Ctrl+C关闭博客<br>    3）、在cmd窗口中输入 hexo n “文章名称” 新建第一篇文章 文章地址在blog\source_posts中，可以用Notepad++来进行编辑<br>         编辑完成后再次启动本地博客，便可在主页中找到该文章</p>
+<p>3、部署博客<br>    1）、登录github，点击右上角的New Repository新建博客仓库，命名格式一定要为：自己英文名称（最好和注册账时的名称一致）.github.io<br>    2）、返回cmd窗口输入 cnpm install –save hexo-deployer-git安装插件<br>    3）、用Notepad++编辑blog文件夹中的<em>config.yml文件，在最下方的#deploy标签中新增，type: git，repo: <a href="https://github.com/chengchenhe/chengchenhe.github.io.git，branch" target="_blank" rel="noopener">https://github.com/chengchenhe/chengchenhe.github.io.git，branch</a>: master<br>         三个属性，在#Site中添加 email: 自己的邮箱 属性，注意冒号后要加一个空格<br>    4）、在cmd窗口中输入 hexo g 将文件部署到远端，部署完成后在github仓库中会有新建文章内容，从此以后在浏览器地址输入上面注册时的地址便可直接访问博客<br>    5）、完成庆祝一下呗(*^</em>^*)</p>
+<p>##本人博客链接，希望可以与大家多多交流哦</p>
+<p><a href="https://chengchenhe.github.io/" target="_blank" rel="noopener">https://chengchenhe.github.io/</a></p>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/10/linux%E5%AD%A6%E4%B9%A0%EF%BC%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            linux简介与基本使用环境搭建</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/07/26/hello-world/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Hello World
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/10/linux%E5%AD%A6%E4%B9%A0%EF%BC%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            linux简介与基本使用环境搭建</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/07/26/hello-world/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Hello World
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

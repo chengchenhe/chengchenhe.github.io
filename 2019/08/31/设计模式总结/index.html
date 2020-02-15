@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>大话设计模式读后感(1-15章)-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">大话设计模式读后感(1-15章)</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2019-08-31</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="一、简单工厂设计模式"><a href="#一、简单工厂设计模式" class="headerlink" title="一、简单工厂设计模式"></a>一、简单工厂设计模式</h3><ol>
+<li>写代码最基本的几个问题<br>&emsp;&emsp;1.1 命名是否规范<br>&emsp;&emsp;1.2 代码是否简洁<br>&emsp;&emsp;1.3 是否有做边缘处理<br>&emsp;&emsp;1.4 代码的可维护性与可拓展性<br>&emsp;&emsp;1.5 代码是否易于复用</li>
+<li>面向对象设计思维（自己理解）<br>&emsp;&emsp;把一个复杂的问题拆分成许多独立的小问题分开解决，在最后用创建对象的方式将他们相互建立连接，解决最初的问题，这样当代码需要添加或修改功能时只需要修改相应的代码块即可，降低了我们的工作量。</li>
+<li>简单工厂设计思想<br>&emsp;&emsp;3.1 设计一个接口类，包含最基本的方法<br>&emsp;&emsp;3.2 设计接口类的具体实现类，实现接口类中的方法，添加自己的功能或特性，一个功能对应一个实现类<br>&emsp;&emsp;3.3 设计一个类来整合所有的实现类，可通过判断来将相应的类实例化并返回<br>&emsp;&emsp;3.4 简单工厂设计思想好处：降低了类与类之间的耦合度，这样需要修改功能时只需要修改对应的实现类即可</li>
+<li>简单工厂代码实现<br><img src="https://img-blog.csdnimg.cn/20190819120333405.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819120340619.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819120346928.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819120353368.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20190819120400226.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="二、UML类图解析"><a href="#二、UML类图解析" class="headerlink" title="二、UML类图解析"></a>二、UML类图解析</h3><p>&emsp;&emsp;5.1 类表示方法：第一层表示类的名称，第二层表示类有什么属性，第三层表示类中包含的方法（+表示public，-表示private，#表示protected）<br><img src="https://img-blog.csdnimg.cn/20190819134337391.png" alt="在这里插入图片描述"><br>&emsp;&emsp;5.2 接口表示方法<br><img src="https://img-blog.csdnimg.cn/2019081913461881.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>&emsp;&emsp;5.3 继承关系：空心三角形+实线</p>
+<p><img src="https://img-blog.csdnimg.cn/20190819134746219.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>&emsp;&emsp;5.4 实现接口：空心三角形+虚线<img src="https://img-blog.csdnimg.cn/20190819134947732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>&emsp;&emsp;5.5 关联关系（<strong><em>一个类中需要创建引用另一个类的对象</em></strong>）：实线箭头<br><img src="https://img-blog.csdnimg.cn/20190819135226748.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>&emsp;&emsp;5.6 聚合关系（<strong><em>A对象可以包含一个或多个B对象，但B对象不是A对象中的一部分</em></strong>）：空心的<br>&emsp;&emsp;菱形+实线箭头</p>
+<p><img src="https://img-blog.csdnimg.cn/20190819135603316.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>&emsp;&emsp;5.7 组合关系</p>
+<p><img src="https://img-blog.csdnimg.cn/20190819135748449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>&emsp;&emsp;5.8 依赖关系</p>
+<p><img src="https://img-blog.csdnimg.cn/20190819135807647.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="三、策略模式"><a href="#三、策略模式" class="headerlink" title="三、策略模式"></a>三、策略模式</h3><ol>
+<li>策略模式概要：策略模式是一种定义一系列算法的方法，从概念上看，所有这些算法都完成相同的工作，只是实现不同，它可以以相同的方式调用所有算法，减少了各种算法类和使用算法类之间的耦合。</li>
+<li>策略模式优点：<br>&emsp;&emsp;2.1 每个算法都有自己单独的实现类，可以在自己的接口中进行测试<br>&emsp;&emsp;2.2 策略模式封装了变化（将需要使用的行为封装到一个个Strategy类中，这样可以在使用这些行为的类中消除条件语句）</li>
+<li>可以用到策略模式的地方：</li>
+</ol>
+<p><strong><em>由于策略模式几乎可以封装任何类型的规则，所以只要在分析过程中听到需要在不同的时间使用不同的算法时，就可以考虑策略模式</em></strong><br>4. 案例：商场收银系统（需要根据不同的情况调用不同的收费方式）<br><img src="https://img-blog.csdnimg.cn/2019081918003182.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819180052103.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819180104904.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2019081918011462.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190819180123341.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/2019081918013147.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<ol start="5">
+<li>小总结：<br>&emsp;&emsp;5.1 策略模式和简单工厂模式：结构上很相似，但是简单工厂模式是创建性模式，它的作用是创建对象；策略模式是行为模式，它是将不同的算法封装在一个对象中，以实现动态调用算法。<br>&emsp;&emsp;5.2 应用问题：若需要管理创建不同对象则用工厂模式，若要实现不同算法的动态调用则使用策略模式<br>&emsp;&emsp;5.3 任何的需求的变化都是需要成本，我们需要做的就是用最小的成本来实现功能的变更</li>
+</ol>
+<h3 id="四、开放-封闭原则"><a href="#四、开放-封闭原则" class="headerlink" title="四、开放-封闭原则"></a>四、开放-封闭原则</h3><ol start="0">
+<li>解决的问题：<br>&emsp;&emsp;怎样的设计才能面对需求的改变却可以保持相对稳定，在系统上线后可以不断更新系统？</li>
+<li>原则简介：<br>&emsp;&emsp;软件实体（类、模块、函数等等）应该可以拓展，但是不可以修改</li>
+<li>两个特征：<br>&emsp;&emsp;2.1 对于拓展是开放的（需求变更时修改代码不会很困难）<br>&emsp;&emsp;2.2 对于更改是封闭的（在修改功能时尽量不要动原有的代码，而是添加新的代码）</li>
+<li>如何运用原则：<br>&emsp;&emsp;3.1 我们在设计程序时要预测最容易产生变化的模块，然后构造抽象来隔离变化。<br>&emsp;&emsp;3.2 若一开始并不知道哪里会发生变化，则假设变化不会发生，当变化发生时，立即创建抽象来隔离以后的同种变化<br>&emsp;&emsp;3.3 面对需求，对程序的改动时通过新增代码实现的，而不是修改原有代码</li>
+<li>小结<br>&emsp;&emsp;开放-封闭原则是面向对象设计思想核心所在，遵循这个原则可以使代码可维护、可拓展、可复用，灵活好。但开发人员应仅对程序中呈现频繁变化的那些部分做出抽象，切记不要对每个部分都做出抽象。<strong><em>拒绝不成熟的抽象和抽象本身一样重要！</em></strong></li>
+</ol>
+<h3 id="五、依赖倒转原则"><a href="#五、依赖倒转原则" class="headerlink" title="五、依赖倒转原则"></a>五、依赖倒转原则</h3><ol>
+<li>定义：<br>&emsp;&emsp;1.1 高层模块不应该依赖低层模块，两个都应该依赖抽象（接口）<br>&emsp;&emsp;1.2 抽象不应该依赖细节，细节应该依赖抽象</li>
+<li>里氏代换原则：<br>&emsp;&emsp;一个软件的实体如果使用的是一个父类的话，那么一定适用于子类，若是把父类替换成子类，程序的行为不会发生改变。即：<strong><em>子类型必须可以替换其父类型</em></strong></li>
+<li>总结：<strong>面向接口编程( ╯□╰ )</strong></li>
+</ol>
+<h3 id="六、装饰模式"><a href="#六、装饰模式" class="headerlink" title="六、装饰模式"></a>六、装饰模式</h3><ol start="0">
+<li>解决的问题：<br>&emsp;&emsp;当项目需要添加功能时，要向主类添加新的代码和逻辑，这样就会增加主类的复杂度，不符合开放-封闭原则。</li>
+<li>定义：<br>&emsp;&emsp;装饰模式，动态的给一个对象添加一些额外的职责，就增加功能来说，装饰模式比生成子类更加灵活</li>
+<li>装饰模式优点：<br>&emsp;&emsp;2.1 能动态的添加新的功能，符合面向对象思维和开放-封闭原则<br>&emsp;&emsp;2.2 有效的把类的核心职责和装饰功能区分开了，去除了类中重复的逻辑，简化了类<br>&emsp;&emsp;2.3 客户代码在运行时可以根据需求有选择的、按顺序的使用装饰功能包装对象</li>
+<li><strong>装饰模式的应用场景：</strong><br>&emsp;&emsp;<strong>需要为已有功能动态添加新的相似功能时</strong><br>&emsp;&emsp;<strong><em>注意：装饰模式的装饰顺序很重要！需要自己考虑</em></strong></li>
+<li><strong>装饰模式实现步骤</strong><br>&emsp;&emsp;4.1 抽象组件：需要装饰的抽象对象(接口或抽象父类)<br>&emsp;&emsp;4.2 具体组件：需要装饰的对象<br>&emsp;&emsp;4.3 抽象装饰类：包含了对抽象组件的应用和装饰者共有的方法<br>&emsp;&emsp;4.4 具体装饰类：被装饰的对象</li>
+<li>装饰模式代码实现<br><img src="https://img-blog.csdnimg.cn/20190821193851735.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190821193900836.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190821193910410.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2019082119391949.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20190821193930647.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190821193941514.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="七、代理模式"><a href="#七、代理模式" class="headerlink" title="七、代理模式"></a>七、代理模式</h3><ol>
+<li>定义：<br>&emsp;&emsp;代理模式，为其它对象提供一种代理以控制对这个对象的访问</li>
+<li>代理模式的好处：<br>&emsp;&emsp;2.1 职责清晰：真实角色就是实现实际的业务逻辑，不必关心其它的事务<br>&emsp;&emsp;2.2 代理对象可以在客户端和目标对象之间起到中介的作用，这样起到了中介的作用和保护了目标对象的作用<br>&emsp;&emsp;2.3 高拓展性</li>
+<li>代理模式实现（静态代理）<br>&emsp;&emsp;3.1 定义Subject接口类：里面有对应的抽象功能<br>&emsp;&emsp;3.2 定义ProxySubject类(代理对象)：实现Subject接口，实现相应的代理功能，里面还需要有被代理对象的引用，真实功能由被代理对象实现<br>&emsp;&emsp;3.3 定义RealSubject类(真实对象)：实现Subject，实现真实功能</li>
+<li>代理模式代码实现：</li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20190822180255462.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190822180307457.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/20190822180314705.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190822180326406.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="八、工厂方法模式"><a href="#八、工厂方法模式" class="headerlink" title="八、工厂方法模式"></a>八、工厂方法模式</h3><ol>
+<li>定义：<br>&emsp;&emsp;工厂方法模式，定义一个用于创建对象的接口，让子类决定具体事例化哪个类。工厂方法模式使一个类的实例化延迟到它的子类</li>
+<li><strong>与简单工厂模式的比较</strong>：<br>&emsp;&emsp;2.1 <strong>优点：工厂方法模式中由于延迟了类的实例化，所以无论我们增加多少产品类，都可以通过添加新的工厂来实现，更加符合开放-封闭原则，进一步降低了代码的耦合。</strong><br>&emsp;&emsp;2.2 <strong>缺点：在工厂方法模式中，因为一个产品类对应一个工厂类，所以若是产品很多则会导致需要很多工厂类；在简单工厂模式中，若是想要修改需求，只需要修改工厂类即可，而工厂方法模式则需要修改客户端！</strong></li>
+<li>工厂方法模式实现：<br>&emsp;&emsp;3.1 创建实际类接口<br>&emsp;&emsp;3.2 创建工厂类接口，里面的方法返回值为实际类对象。<br>&emsp;&emsp;3.3 创建实际类的实现类<br>&emsp;&emsp;3.4 创建工厂类的实现类，一个工厂类对应一个实际类<br>&emsp;&emsp;3.5 客户端根据需求调用相应的工厂类创建对象</li>
+<li>工厂方法模式代码实现<br><img src="https://img-blog.csdnimg.cn/20190822185832805.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190822185908520.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/201908221859232.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<h3 id="九、原型模式"><a href="#九、原型模式" class="headerlink" title="九、原型模式"></a>九、原型模式</h3><ol>
+<li><strong>定义：</strong><br>&emsp;&emsp;原型模式(Prototype)，用原型实例指定创建对象的种类，并且通过拷贝这些对象创建新的对象</li>
+<li><strong>原型模式的分类：</strong><br>&emsp;&emsp;2.1 浅复制：可以正常复制与修改对象中的值类型字段(String,int,Double等普通类型)，但若是存有Object类型的话，则无法正常修改(<strong><em>例子：原型模式复制了一个包含Date属性的对象，若是修改原有对象中Date属性，复制对象中的属性也会被修改</em></strong>)<br>&emsp;&emsp;2.2 深复制：解决了浅复制的缺点，所有对象都可正常复制修改</li>
+<li><strong>原型模式优点：</strong><br>&emsp;&emsp;当需要创建大量相似对象时，每New一次都需要执行一次构造函数性能不高，而使用原型模式则隐藏了创建细节，而且对性能也有了很大的提高</li>
+<li><strong>原型模式应用场景：</strong><br>&emsp;&emsp;需要创建大量重复对象时</li>
+<li><strong>原型模式实现方法（由于浅复制的缺点，这里仅实现深复制）：</strong><br>&emsp;&emsp;5.1 需要复制的类对象中实现Cloneable接口<br>&emsp;&emsp;5.2 需要复制的类中的对象属性也要实现Cloneable接口，只有自己创建的类才需要，系统自带的类已经默认实现了Cloneable接口<br>&emsp;&emsp;5.2 覆写clone方法，直接调用父类(默认为Object类)的super.clone()方法复制对象，对需要复制的属性用this.属性名.clone()调用其clone()方法</li>
+<li><strong>原型模式代码实现</strong><br><img src="https://img-blog.csdnimg.cn/20190823205025739.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190823205821889.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<h3 id="十、模板方法模式"><a href="#十、模板方法模式" class="headerlink" title="十、模板方法模式"></a>十、模板方法模式</h3><p>1.<strong>定义:</strong><br>&emsp;&emsp;定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。<br>2. <strong>优点：</strong><br>&emsp;&emsp;2.1 该模式通过把不变的行为转移到模板方法中，去除了子类中的重复代码<br>&emsp;&emsp;2.2 当不变与可变的行为在方法的子类实现中混合到一起的时候，不变的行为就会在子类中重复出现。通过模板方法可以把这些行为搬运到单一的地方，帮助子类摆脱了重复的行为<br>3. <strong>运用场景</strong><br>&emsp;&emsp;当我们遇到由一系列步骤构成的过程需要执行，而这个过程在大体上是一致的，只有某些特定步骤需要修改，这时就可以考虑模板方法模式（<strong><em>比如做试卷，题目都是一样的，若是每做一次都，要抄题则会严重影响效率，这时就可以用模板方法模式，只写答题卡</em></strong>）<br>4. <strong>模板方法模式实现</strong><br>&emsp;&emsp;把类定义为抽象类，把类中重复的方法集中到一个模板方法中执行，将需要修改的方法定义为抽象方法（钩子方法），在子类中只需实现钩子方法即可<br>5. <strong>代码实现</strong><br><img src="https://img-blog.csdnimg.cn/20190824171037336.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190824171047274.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190824171056127.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="十一、建造者模式"><a href="#十一、建造者模式" class="headerlink" title="十一、建造者模式"></a>十一、建造者模式</h3><ol>
+<li><strong>定义：</strong><br>&emsp;&emsp;将一个复杂对象的创建与它的表示分离，使得同样的构建过程可以创建不同的对象</li>
+<li><strong>优点：</strong><br>&emsp;&emsp;2.1 如果用户用了建造者模式，那么用户只需要指定具体的类型就可以得到它们，不需要知道方法，降低了耦合性<br>&emsp;&emsp;2.2 建造者模式使得建造代码与表示代码分离，这样若需要改变一个产品的内部表示，只需要再定义一个建造者即可。</li>
+<li><strong>使用场景：</strong><br>&emsp;&emsp;一些基本对象不会变，但其组合会变（<strong><em>如电脑</em></strong>）</li>
+<li><strong>模式实现：</strong><br>&emsp;&emsp;4.1 创建Product(实体)类<br>&emsp;&emsp;4.2 创建builder接口，里面有构造实体类中组件的方法<br>&emsp;&emsp;4.3 创建Concretebuilder类，实现builder接口，覆写其中的方法<br>&emsp;&emsp;4.4 创建Director类，里面有对builder的引用，提供一个方法完成构造并返回对象</li>
+<li><strong>代码实现：</strong><br><img src="https://img-blog.csdnimg.cn/20190825174906119.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190825174915155.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190825174924355.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190825174941511.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190825174949297.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+<h3 id="十二、观察者模式"><a href="#十二、观察者模式" class="headerlink" title="十二、观察者模式"></a>十二、观察者模式</h3><ol>
+<li><strong>定义：</strong><br>&emsp;&emsp;定义了一种一对多的依赖关系，让多个观察者对象同时监听一个主题对象。这个主题对象在状态发生变化时，会通知所有的观察者对象，是它们能够更新自己</li>
+<li><strong>优点：</strong><br>&emsp;&emsp;2.1 观察者和被观察者是抽象耦合的<br>&emsp;&emsp;2.2 建立了一套触发机制</li>
+<li><strong>缺点：</strong><br>&emsp;&emsp;3.1 如果一个被观察对象有许多直接或间接观察对象时，通知可能需要花费大量时间<br>&emsp;&emsp;3.2 如果观察对象与被观察对象存在依赖关系的话，有可能会互相调用，造成死循环<br>&emsp;&emsp;3.3 被观察者只能知道观察者发生了变化，而不能知道观察者发生了什么变化</li>
+<li><strong>应用场景：</strong><br>&emsp;&emsp;一个对象发生改变，所有依赖该对象的对象都将得到通知</li>
+<li><strong>如何实现：</strong><br>&emsp;&emsp;5.1 创建Subject(被观察者)类，里面定义一个观察者容器，有相关增删函数，以及一个方法用于用于当状态改变时通知所有观察者<br>&emsp;&emsp;5.2 创建Observer(观察者接口)，里面定义通知到来时的更新方法（update()）<br>&emsp;&emsp;5.3 创建ConcreteSubject(观察者实例类)，定义一个属性用于更新通知（如状态码），当调用该属性set方法时，调用父类的通知方法更新观察者<br>&emsp;&emsp;5.4 创建Observer实现类，里面定义一个与ConcreteSubject中属性相同的属性用于接收，覆写update方法</li>
+<li><strong>代码实现：</strong></li>
+</ol>
+<p><img src="https://img-blog.csdnimg.cn/20190826195531836.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190826195542508.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/20190826195549436.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190826195600476.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190826195629852.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="十三、抽象工厂模式"><a href="#十三、抽象工厂模式" class="headerlink" title="十三、抽象工厂模式"></a>十三、抽象工厂模式</h3><ol>
+<li><strong>定义：</strong><br>&emsp;&emsp;抽象工厂模式（Abstract Factory Pattern）是围绕一个超级工厂创建其他工厂。该超级工厂又称为其他工厂的工厂。这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式</li>
+<li><strong>优点：</strong><br>&emsp;&emsp;2.1 易于交换产品系列，由于具体工厂类在代码中只出现一次，这就使得改变一个应用的具体工厂十分方便，只需要改变具体工厂就可以使用不同的产品配置<br>&emsp;&emsp;2.2 它让具体的创建过程与客户端分离，客户端是通过它们的抽象接口操纵实例，产品的具体类名也被具体工厂实现分离，不会出现在客户端中</li>
+<li><strong>缺点：</strong><br>&emsp;&emsp;产品族扩展非常困难，要增加一个系列的某一产品，既要在抽象的 Creator 里加代码，又要在具体的里面加代码</li>
+<li><strong>应用场景：</strong><br>&emsp;&emsp;系统的产品有多于一个的产品族，而系统只消费其中某一族的产品</li>
+<li><strong>如何实现：</strong><br>&emsp;&emsp;5.1 创建实体类<br>&emsp;&emsp;5.2 创建实体类工厂，每一个实体类对应一个工厂类<br>&emsp;&emsp;5.3 创建抽象工厂接口，里面放回需要构造的实体类，一个实体类对应一个方法<br>&emsp;&emsp;5.4 实现抽象工厂接口，在对应方法中选择调用相应实体类工厂创建产品</li>
+<li><strong>代码实现：</strong><br><img src="https://img-blog.csdnimg.cn/20190828161121828.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190828161128837.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190828161136163.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190828161141682.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20190828161148297.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/15/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%85%A8%E8%BF%87%E7%A8%8B/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            深入理解JVM--类加载全过程</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/10/linux%E5%AD%A6%E4%B9%A0%EF%BC%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">linux简介与基本使用环境搭建
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/15/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%85%A8%E8%BF%87%E7%A8%8B/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            深入理解JVM--类加载全过程</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/10/linux%E5%AD%A6%E4%B9%A0%EF%BC%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">linux简介与基本使用环境搭建
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、简单工厂设计模式"><span class="toc-text">一、简单工厂设计模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、UML类图解析"><span class="toc-text">二、UML类图解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、策略模式"><span class="toc-text">三、策略模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、开放-封闭原则"><span class="toc-text">四、开放-封闭原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五、依赖倒转原则"><span class="toc-text">五、依赖倒转原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#六、装饰模式"><span class="toc-text">六、装饰模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#七、代理模式"><span class="toc-text">七、代理模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#八、工厂方法模式"><span class="toc-text">八、工厂方法模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#九、原型模式"><span class="toc-text">九、原型模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#十、模板方法模式"><span class="toc-text">十、模板方法模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#十一、建造者模式"><span class="toc-text">十一、建造者模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#十二、观察者模式"><span class="toc-text">十二、观察者模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#十三、抽象工厂模式"><span class="toc-text">十三、抽象工厂模式</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

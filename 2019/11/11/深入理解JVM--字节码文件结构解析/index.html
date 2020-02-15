@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>深入理解JVM--字节码文件结构解析-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">深入理解JVM--字节码文件结构解析</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2019-11-11</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p><font color=#00aeef ></font></p>
+<ol>
+<li>在cmd窗口使用<font color=#00aeef >javap -verbose 类名称</font> 命令分析一个字节码文件时，将会分析<strong>该字节码文件的魔数、版本号、常量池、类信息、类的构造方法、类中的方法信息、类变量与成员变量等信息</strong>。</li>
+<li>字节码整体结构<br><img src="https://img-blog.csdnimg.cn/20191111111912979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>魔数：所有的.class字节码文件的前4个字节都是魔数，魔数为固定值：<font color=#00aeef >0xCAFEBABE</font>，若魔数不对JVM会认为该字节码文件非法而不去加载</li>
+<li><strong>魔数之后的4个字节为版本信息，前两个字节表示minor version（次版本号），后两个字节表示major version（主版本号）。</strong> 如：<font color=#00aeef >00 00 00 34</font>，换算成十进制，表示次版本号为0，主版本号为52.所以，该文件的版本号为：<font color=#00aeef >1.8.0</font>。可以通过java -version命令来验证这一点。</li>
+<li><strong><em>常量池（constant pool）：</em></strong> Class文件的资源仓库，Java类中定义的方法与变量信息，都是存储在常量池中。 <strong>常量池中主要存储两类常量：字面量和符号引用。</strong> 字面量如文本字符串，Java中声明为final的常量值等，而符号引用如类和接口的全局限定名，字段的名称和描述符，方法的名称和描述符等。<ul>
+<li><strong>常量池数量：</strong> 常量池数量紧跟在主版本号后面，占据2个字节。</li>
+<li><strong>常量池数组：</strong> 常量池数组则紧跟在常量池数量之后。 <strong><em>每一种元素的第一个数据都是一个u1类型，该字节是个标志位，占据1个字节。</em></strong> <font color=#00aeef >常量池数组中元素的个数=常量池数-1</font>，根本原因在于：索引为0也是一个常量（保留常量），只不过他不位于常量表中，这个常量就对应null值； 所以，常量池的索引从1而非0开始。</li>
+<li>在JVM规范中，每个变量/字段都有描述信息，<strong><em>基本数据类型和代表无返回值的void类型都用一个大写字符来表示，对象类型则使用字符<font color=#00aeef >L加对象的全限定名称</font>来表示。</em></strong> 为了压缩字节码文件的体积，对于基本数据类型，JVM都只使用一个大写字母来表示，如下所示：<strong>B - byte，C -char，D - double，F - float，I - int，<font color=#00aeef >J - long</font>，S - short，<font color=#00aeef >Z - boolean</font>，V - void，<font color=#00aeef >L - 对象类型，如Ljava/lang/String；</font></strong></li>
+<li><strong><em>对于数组类型来说，每一个维度使用一个前置的 [ 来表示，如 int[ ]被记录为  [ I；String[ ][ ]被记录为 [ [ Ljava/lang/String；</em></strong></li>
+<li>用描述符描述方法时，按照<strong>先参数列表，后返回值</strong>的顺序来描述。参数列表按照参数的严格顺序放在一组（）之内，如方法：<strong><em>String getName(int id，String name)的描述符为：(I，Ljava/lang/String；) Ljava/lang/String；</em></strong></li>
+<li>常量池中的数据结构<br><img src="https://img-blog.csdnimg.cn/20191111094841921.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ul>
+</li>
+<li><strong>类的访问控制权限（占据2个字节）</strong></li>
+<li><strong>类名（占据2个字节）</strong></li>
+<li><strong>父类名（占据2个字节）</strong></li>
+<li><strong>接口信息</strong><ul>
+<li>接口个数（占据2个字节）</li>
+<li>接口名（一个名字占据2个字节）</li>
+</ul>
+</li>
+<li><strong>类中属性的信息</strong><ul>
+<li>属性的个数（占据2个字节）</li>
+<li>属性表<br><img src="https://img-blog.csdnimg.cn/20191111095517200.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ul>
+</li>
+<li><strong><em>类中方法的信息</em></strong><ul>
+<li>方法的个数（占据2个字节）</li>
+<li>方法表<br><img src="https://img-blog.csdnimg.cn/20191111100020604.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ul>
+<li>方法的访问控制权限</li>
+<li>方法的名称的索引（占据2个字节，在常量池中）</li>
+<li>方法的描述索引（占据2个字节，在常量池中）</li>
+<li>方法中的属性个数（占据2个字节）</li>
+<li>方法中的属性表（一般有且只有一个，名称为<font color=#00aeef >Code</font>）<br><img src="https://img-blog.csdnimg.cn/20191111101411666.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ul>
+<li>属性名称（占据2个字节）</li>
+<li>属性所占字节码长度（占据4个字节）</li>
+<li><strong>max_stack:</strong> 该方法中栈的最大深度</li>
+<li><strong>max_locals:</strong> 该方法中所存在的属性</li>
+<li><strong>arg_size:(并不在字节码文件中，JVM自动判断生成)</strong> 该方法中的参数个数（大于等于1，默认会传入this）</li>
+<li>方法中真正执行代码<font color=#00aeef >（助记符）</font>所占的长度</li>
+<li>助记符的信息（占据一个字节）</li>
+<li>方法中的额外属性表（一般有2个，<font color=#00aeef >LineNumberTable</font>和<font color=#00aeef >LocalVariableTable</font>）<ul>
+<li>LocalNumberTable（用于记录助记符与源码行号之间的关系）<br><img src="https://img-blog.csdnimg.cn/20191111102545390.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>LocalVariableTable（用于记录方法中变量的具体信息）<ul>
+<li>LocalVariableTable所占字节码长度（4个字节）</li>
+<li>LocalVariableTable所显示的属性个数（方法中属性个数）</li>
+<li>属性信息（占据10个字节）<br><img src="https://img-blog.csdnimg.cn/20191111104048111.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>类中附加属性的个数（占据2个字节）</strong></li>
+<li><strong>附加属性表</strong></li>
+<li>博主自己写的小程序，可以实现对一些简单类的反编译，仅供参考学习哦O(∩_∩)O<ul>
+<li><a href="https://pan.baidu.com/s/1GyUoLoTvcrTYg4id1X11-Q" target="_blank" rel="noopener">https://pan.baidu.com/s/1GyUoLoTvcrTYg4id1X11-Q</a></li>
+<li>6ry1</li>
+</ul>
+</li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/02/15/Mybatis--SqlSession%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            Mybatis--SqlSession对象创建过程</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--类加载过程深入解析
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/02/15/Mybatis--SqlSession%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            Mybatis--SqlSession对象创建过程</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/10/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--类加载过程深入解析
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

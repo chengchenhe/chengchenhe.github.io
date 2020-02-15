@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>Mybatis--SqlSession对象创建过程-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">Mybatis--SqlSession对象创建过程</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-02-15</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p><strong><em>mybatis是个很方便的框架，其中最重要的无疑就是session对象了。知其然，知其所以然才能不断提高，今天开始尝试阅读源码，掌握更多的知识！当然，本篇皆为个人推测总结，博主才疏学浅，有错误望包涵指出！</em></strong></p>
+<h3 id="一-源码阅读"><a href="#一-源码阅读" class="headerlink" title="一. 源码阅读"></a>一. 源码阅读</h3><ol>
+<li><p>通过Resource加载全局配置文件，并返回一个流对象<br><img src="https://img-blog.csdnimg.cn/20200102151130636.png" alt="加载配置文件"></p>
+</li>
+<li><p>实例化SqlSessionFactoryBuilder对象，通过其build方法，传入全局配置文件的流对象，创建SqlSessionFactory对象<br><img src="https://img-blog.csdnimg.cn/20200102151442656.png" alt="获得工厂对象"></p>
+<ul>
+<li>进入build方法，发现里面调用了一个需要传3个参数的build方法<br><img src="https://img-blog.csdnimg.cn/20200102151859987.png" alt="build"></li>
+<li>再次进入这个build方法，发现它由传入的流对象创建了一个XMLConfigBuilder对象取名为parse,<strong><em>通过名字我们可以推测实际上是由这个对象解析的mybatis.xml文件，并把其中的配置信息放入parse中</em></strong>，再次调用了一个build方法，传入parse.parse()返回的参数<br><img src="https://img-blog.csdnimg.cn/20200102152521391.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>先进入build方法，发现传入的参数是一个对象，并通过这个对象实例化DefaultSqlSessionFactory对象并返回，<strong><em>由此我们可以推测parse方法作用就是构建的是一个有配置文件信息的Configuration对象</em></strong><br><img src="https://img-blog.csdnimg.cn/20200102153651587.png" alt="在这里插入图片描述"></li>
+<li>进入parse方法，果然返回的是一个Configuration对象<br><img src="https://img-blog.csdnimg.cn/20200102153815288.png" alt="在这里插入图片描述"></li>
+<li>进入DefaultSqlSessionFactory的构造方法，发现这个类实现了SqlSessionFactory接口，自然对象可以算做SqlSessionFactory的对象<br><img src="https://img-blog.csdnimg.cn/20200102154122890.png" alt="在这里插入图片描述"></li>
+<li><strong><em>至此我们可以得知我们得到的factory对象实际上是由拥有配置文件信息的Configuration对象创建的DefaultSqlSessionFactory对象，第二步结束</em></strong></li>
+</ul>
+</li>
+<li><p>通过我们得到的工厂对象调用其penSession方法获得我们需要的SqlSession对象<br><img src="https://img-blog.csdnimg.cn/20200102154629795.png" alt="在这里插入图片描述"></p>
+<ul>
+<li>进入该方法，发现只能进入SqlSession接口，<strong><em>但由前面可知这个工厂对象实际为DefaultSqlSessionFactory对象，所以我们进入DefaultSqlSessionFactory类寻找其实现的openSession方法</em></strong><br><img src="https://img-blog.csdnimg.cn/20200102154950988.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>找到DefaultSqlSessionFactory中的openSession方法，发现其调用了openSessionFromDataSource方法，<strong><em>由方法名我们可以推断这个方法就是构造有配置文件信息的SqlSession对象了</em></strong>，并传入了三个参数<br><img src="https://img-blog.csdnimg.cn/20200102155628878.png" alt="在这里插入图片描述"></li>
+<li>进入该方法，<strong><em>由参数名可推断第一个参数为Sql执行器，第二个参数为事务等级，第三个参数为是否自动提交事务</em></strong>。<br><img src="https://img-blog.csdnimg.cn/2020010216051427.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ul>
+<li>方法首先定义了一个事务对象tx，<strong>且由下面的try，catch代码块可知如果程序出了错误该对象会阻止提交事务并关闭该事务对象！</strong><br><img src="https://img-blog.csdnimg.cn/20200102160632956.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>然后定义了一个配置环境对象，由全局配置对象configuration来获取并实例化该对象<br><img src="https://img-blog.csdnimg.cn/20200102160843352.png" alt="在这里插入图片描述"></li>
+<li>下面2行为通过相应的配置信息来创建事务工厂对象，然后通过工厂来实例化上面所定义的事务对象<br><img src="https://img-blog.csdnimg.cn/20200102161034545.png" alt="在这里插入图片描述"></li>
+<li><strong>最后返回通过相应参数构造的DefaultSqlSession对象，至此，SqlSession对象创建完毕！</strong><img src="https://img-blog.csdnimg.cn/20200102161359996.png" alt="在这里插入图片描述"><h3 id="二-文字总结"><a href="#二-文字总结" class="headerlink" title="二. 文字总结"></a>二. 文字总结</h3></li>
+</ul>
+</li>
+<li>通过Resources获取全局配置文件流对象</li>
+<li>实例化SqlSessionFactoryBuilder对象，通过其bulid方法构造SqlSessionFactory工厂对象<ul>
+<li>通过XMLConfigBuilder对象解析配置文件流对象，并构造Configuration对象</li>
+<li>通过Configuration对象实例化DefaultSqlSessionFactory对象并返回</li>
+</ul>
+</li>
+<li>通过工厂对象调用openSession方法构造SqlSession对象<ul>
+<li>通过全局配置configuration对象实例化Environment对象</li>
+<li>通过Environment对象创建事务工厂，由事务工厂创建事务Transaction对象</li>
+<li>创建执行器</li>
+<li>通过相应参数实例化DefaultSqlSession对象并返回</li>
+<li>如果程序出错则销毁事务对象<h3 id="三-图像总结"><a href="#三-图像总结" class="headerlink" title="三. 图像总结"></a>三. 图像总结</h3><img src="https://img-blog.csdnimg.cn/20200102163703721.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/02/15/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E9%98%85%E8%AF%BB%E6%80%BB%E7%BB%93(16-)/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            大话设计模式读后感(16-)</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/11/11/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--字节码文件结构解析
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/02/15/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E9%98%85%E8%AF%BB%E6%80%BB%E7%BB%93(16-)/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            大话设计模式读后感(16-)</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/11/11/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--字节码文件结构解析
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一-源码阅读"><span class="toc-text">一. 源码阅读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二-文字总结"><span class="toc-text">二. 文字总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三-图像总结"><span class="toc-text">三. 图像总结</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

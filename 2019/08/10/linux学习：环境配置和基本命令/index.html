@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>linux简介与基本使用环境搭建-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">linux简介与基本使用环境搭建</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2019-08-10</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="Linux-简介"><a href="#Linux-简介" class="headerlink" title="Linux 简介"></a>Linux 简介</h3><ol>
+<li>发展历史<br>&ensp;&ensp;&ensp;丹尼斯·里奇 肯·汤普逊<br>&ensp;&ensp;&ensp;系统内核汇编.<br>&ensp;&ensp;&ensp;B 语言.<br>&ensp;&ensp;&ensp;C 语言做为内核语言,发明 unix<br>&ensp;&ensp;&ensp;linus 召集 unix 原班人马.发明了系统 linus 后更名为 linu</li>
+<li>所谓的 linux 都是统称,具体版本都叫做发行版.</li>
+<li>著名的发行版</li>
+<li>1 redhat: 目前全球最大的 linux 发行厂商.(收费)</li>
+<li>2 ubuntu:免费版本.界面比较好</li>
+<li>3 麒麟.</li>
+<li>4 CentOS:免费.由 redhat 分支.</li>
+<li>定位</li>
+<li>1 操作系统.</li>
+<li>2 适合于服务器系统,不适合办公系统.</li>
+<li>linux 相对 window 优点</li>
+<li>1 稳定</li>
+<li>2 安全性比较高</li>
+<li>3 免费</li>
+</ol>
+<h3 id="linux系统目录介绍"><a href="#linux系统目录介绍" class="headerlink" title="linux系统目录介绍"></a>linux系统目录介绍</h3><ol>
+<li>在公司中 linux 都是没有界面.</li>
+<li>系统路径</li>
+<li>1 / 表示根目录</li>
+<li>2 ~ 表示/root</li>
+<li>3 etc 存放系统配置目录.</li>
+<li>4 home 除了root以为所有用户默认在home下新建一个以用户<br>&ensp;&ensp;&ensp;名做为文件夹名称的文件夹<br>&ensp;&ensp;&ensp;2.4.1 用户 xxx 对/home/xxx 具有完全操作权限.<br>2.5 root 用户 root 单独文件夹<br>2.6 usr 所有用户安装的软件都放入到这个文件夹中<br>&ensp;&ensp;&ensp;2.6.1 在usr/local下新建一个tmp,所有压缩包都上传到tmp中.</li>
+<li>常用命令<br>3.1 pwd(print word directory) :打印工作目录，当前文件夹全路径<br>3.2 cd :进入文件夹<br>&ensp;&ensp;&ensp;3.2.1 cd .. :进入上一级<br>&ensp;&ensp;&ensp;3.2.2 cd 路径 :进入指定文件夹<br>3.3 mkdir 文件名 :在当前文件夹新建一个空文件夹<br>3.4 touch 文件名 :在当前文件夹新建一个空文件<br>3.5 vi和vim :编辑指定文件<br>&ensp;&ensp;&ensp;3.5.1 如果指定文件不存在，会创建文件<br>&ensp;&ensp;&ensp;3.5.2 进入文件后是只读状态，想进入编辑状态可通过键盘上的 ‘i’或’INS’<br>&ensp;&ensp;&ensp;3.5.3 退出编辑状态返回只读状态用键盘上的 ‘Esc’ 键<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;3.5.3.1 此时输入 ‘:wq’ 代表保存并退出<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;3.5.3.2 此时输入 ‘:q’ 代表直接退出<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;3.5.3.3 此时输入 ‘:q!’ 代表强制退出<br>&ensp;&ensp;&ensp;3.5.4 vim相当于vi的升级，编辑文字将带有颜色<br>3.6 cat 文件名 :查看该文件所有内容<br>3.7 head -n 文件名 :查看该文件前n行内容，如果不写n默认为前十行内容<br>3.8 tail -n 文件名 :查看该文件后n行内容，如果不写n默认为后十行内容<br>3.9 tailf -n 文件名 :动态显示该文件后n行内容，常用于显示tomcat服务器日志<br>3.10 echo ‘内容’ &gt;&gt; 文件名 :往指定文件中添加内容<br>3.11 cp 原文件 新文件路径 :复制文件<br>  3.11.1 cp -r 复制文件夹，如果不加-r复制文件夹时会报错<br>3.12 mv 原文件 新文件路径 :剪切文件（同时可用于重命名）<br>3.12 rm 文件名 :删除指定文件<br>&ensp;&ensp;&ensp;3.12.1 rm -r 文件夹名 :删除指定目录<br>&ensp;&ensp;&ensp;3.12.2 rm -f 文件名 :删除指定文件，不需要确认<br>&ensp;&ensp;&ensp;3.12.3 rm -rf 文件夹名 :删除指定文件夹，不需要确认<br>3.13 ctrl+V 中断当前操作<br>3.14 clear 清屏</li>
+<li>不同用户登录效果<br>4.1 普通用户:[hcc@localhost ~]$<br>4.2 root用户:[root@localhost ~]# w</li>
+<li>linux 所有需要写路径的地方支持两种写法<br>5.1 全路径,标志:以/开头<br>5.2 相对路径:从当前资源一步一步寻找其他资源过程</li>
+</ol>
+<h3 id="XShell"><a href="#XShell" class="headerlink" title="XShell"></a>XShell</h3><ol>
+<li>linux 客户端工具.</li>
+<li>CentOS 中默认只开启 22 端口.其他端口都被防火墙拦截.<h3 id="Filezilla-工具使用"><a href="#Filezilla-工具使用" class="headerlink" title="Filezilla 工具使用"></a>Filezilla 工具使用</h3></li>
+<li>FTP 协议<br>1.1 英文名称(FileTransfer Protocol)<br>1.2 作用:互联网中,计算机之间传输文件需要遵守的协议.</li>
+<li>fileziila<br>2.1 基于 FTP 协议的客户端工具.<br>2.2 使用 filezilla 可以快速完成文件传输功能.</li>
+</ol>
+<h3 id="JDK的安装（jdk8）"><a href="#JDK的安装（jdk8）" class="headerlink" title="JDK的安装（jdk8）"></a>JDK的安装（jdk8）</h3><ol>
+<li>通过Filezilla将压缩包上传到/usr/local/tmp下</li>
+<li>解压压缩包：<strong># tar zxvf 文件名</strong></li>
+<li>将解压后的文件复制到/usr/local/jdk8中：<strong># cp -r 文件名 /usr/local/jdk8</strong></li>
+<li>配置环境变量：<strong># vim /etc/profile</strong></li>
+<li>修改文件内容<br>&ensp;&ensp;&ensp;5.1 分割使用冒号<br>&ensp;&ensp;&ensp;5.2 $表示变量引用<br>&ensp;&ensp;&ensp;5.3 在export中添加或修改变量<br>&ensp;&ensp;&ensp;<strong>#export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL</strong><br>&ensp;&ensp;&ensp;<strong>export JAVA_HOME=/usr/local/jdk8</strong><br>&ensp;&ensp;&ensp;<strong>export PATH= $JAVA_HOME/bin: $PATH</strong><br>&ensp;&ensp;&ensp;<strong>export CLASSPATH=.: $JAVA_HOME/lib/dt.jar: $JAVA_HOME/lib/tools.jar</strong><br>&ensp;&ensp;&ensp;<strong><em>注: $前面没有空格，上面是因博客编辑问题才加上的</em></strong></li>
+<li>解析文件（或重启系统）：<strong># source /etc/profile</strong></li>
+<li>验证是否安装成功：<strong># java -version</strong></li>
+</ol>
+<h3 id="tomcat的安装（tomcat7）"><a href="#tomcat的安装（tomcat7）" class="headerlink" title="tomcat的安装（tomcat7）"></a>tomcat的安装（tomcat7）</h3><ol>
+<li>通过Filezilla将压缩包上传到 /usr/local/tmp中</li>
+<li>解压文件：<strong># tar zxvf 文件名</strong></li>
+<li>将文件复制到 /usr/local/tomcat中：<strong># -r 文件名 /usr/local/tomcat</strong></li>
+<li>配置环境变量：<strong># vim /etc/profile</strong></li>
+<li>添加文件内容<br>&ensp;&ensp;&ensp;<strong>export TOMCAT_HOME=/usr/local/tomcat</strong><br>&ensp;&ensp;&ensp;<strong>export CATALINA_HOME=/usr/local/tomcat</strong></li>
+<li>因为防火墙默认只放行22端口，所以要开启tomcat的8080端口<br>&ensp;&ensp;&ensp;6.1 <strong># vim /etc/sysconfig/iptables</strong><br>&ensp;&ensp;&ensp;6.2 <strong>将包含22端口的那一行复制，粘贴并将22改为8080即可</strong><br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;注：<strong><em>若改为8080:9000则代表将8080至9090端口全部放行</em></strong></li>
+<li>进入tomcat下bin目录 : <strong># cd /usr/tomcat/bin</strong></li>
+<li>启动tomcat：<strong>./startup.sh</strong><br>&ensp;&ensp;&ensp;8.1 启动tomcat并打印日志文件：<strong>./startup.sh &amp; tailf ../logs/catalina.out</strong></li>
+<li>在浏览器地址中输入：你的ip地址:8080/ 若成功出现网页则代表tomcat安装成功</li>
+</ol>
+<h3 id="MySQL的安装"><a href="#MySQL的安装" class="headerlink" title="MySQL的安装"></a>MySQL的安装</h3><p><strong><em>友情建议：若安装过程中出现错误或mysql没有卸载干净的话，有可能导致一直安装不上mysql，博主当时就因为mysql没有卸载干净一直安装不上，最后是重新建了个linux系统才成功安装，在此强烈建议大家最好为没安装前的linux系统拍摄快照，这样失败了也可以返回之前的状态重新安装！！</em></strong></p>
+<ol>
+<li>博主采用的是在线安装，版本为mysql8.3，网速较慢或者在线安装失败的也可以采用解压缩方法安装</li>
+<li>centos默认下载速度较慢，所以安装前最好替换yum源为阿里云yum<br>&ensp;&ensp;&ensp;2.1进入yum源配置文件所在文件夹：<strong># cd /etc/yum.repos.d/</strong><br>&ensp;&ensp;&ensp;2.2下载阿里云的yum源配置文件（操作前最好做好相应备份）<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;博主为centos6，其它版本可自行上网搜索阿里云yum网址<br>&ensp;&ensp;&ensp;执行：wget -O /etc/yum.repos.d/CentOS-Base.repo <a href="http://mirrors.aliyun.com/repo/Centos-6.repo" target="_blank" rel="noopener">http://mirrors.aliyun.com/repo/Centos-6.repo</a><br>&ensp;&ensp;&ensp;2.3清理：<strong>yum clean all</strong><br>&ensp;&ensp;&ensp;2.4更新缓存：<strong>yum makecache</strong><br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<strong>yum install  tree -y</strong><br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<strong>yum update -y</strong></li>
+<li>清理环境，查看是否有已安装的mysql，如果有则卸载<br>&ensp;&ensp;&ensp;3.1 执行：<strong># rpm -qa | grep mysql</strong><br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;若有结果则执行：<strong>rpm -e 结果 -nodeps</strong><br>&ensp;&ensp;&ensp;3.2 执行：<strong>find / -name mysql</strong> 查找所有mysql的文件夹<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;执行：<strong>rm -rf -名称</strong> 删除这些文件夹<br>&ensp;&ensp;&ensp;3.3 再次执行：<strong># rpm -qa | grep mysql</strong>，若无结果则代表卸载完成</li>
+<li>进入官网(<a href="https://dev.mysql.com/downloads/repo/yum/)找到自己的版本，下载对应的mysql" target="_blank" rel="noopener">https://dev.mysql.com/downloads/repo/yum/)找到自己的版本，下载对应的mysql</a> yum源<br><a href="https://imgchr.com/i/eXPGTg" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYUEdUZy5wbmc" alt="eXPGTg.png"></a></li>
+</ol>
+<p><a href="https://imgchr.com/i/eXiSHS" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYaVNIUy5wbmc" alt="eXiSHS.png"></a></p>
+<p>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;4.1执行：<strong>wget <a href="https://dev.mysql.com/get/mysql80-community-release-el6-3.noarch.rpm" target="_blank" rel="noopener">https://dev.mysql.com/get/mysql80-community-release-el6-3.noarch.rpm</a></strong>(<strong><em>你复制的链接</em></strong>)<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;4.2执行：<strong># rpm -ivh mysql80-community-release-el6-3.noarch.rpm</strong>(<strong><em>将上面你下载的文件名粘贴下来</em></strong>)</p>
+<ol start="5">
+<li><p>使用yum安装mysql：<strong># yum install mysql-community-server</strong></p>
+</li>
+<li><p>启动mysql：<strong># service mysqld start</strong>，启动后可用：<strong># service mysqld status</strong>进行状态查看<br>&ensp;&ensp;&ensp;<strong><em>注：如果启动时 init database 为 OK 则恭喜你：基本安装成功了，若为false则很头疼了，出现这个问题大概率是之前的mysql没有卸载干净，博主当时就是这个卡了好久，若再次卸载安装还是失败了的话建议从快照版本重新安装。</em></strong></p>
+</li>
+<li><p>修改密码<br>&ensp;&ensp;&ensp;7.1启动时候mysql会输出初始密码，mysql在安装后会创建一个root@locahost账户，并且把初始的密码放到了/var/log/mysqld.log文件中<br><a href="https://imgchr.com/i/eX1qZ4" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYMXFaNC5wbmc" alt="eX1qZ4.png"></a><br>&ensp;&ensp;&ensp;7.2记住默认密码并执行：# mysql -u root -p ，输入默认密码进入mysql命令页<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<strong><em>注：在输入密码时系统是不会显示密码的</em></strong><br>&ensp;&ensp;&ensp;7.3修改密码：mysql&gt; ALTER USER ‘用户名(默认为root)‘@’你的主机或虚拟机ip’ IDENTIFIED BY ‘你的新密码’;<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<strong><em>注：密码太简单了也会报错</em></strong><br>&ensp;&ensp;&ensp;7.4 修改密码后退出mysql：<strong>mysql&gt;exit</strong><br>&ensp;&ensp;&ensp;7.5 推出后执行：<strong># service mysqld restart</strong> 重启mysql服务就可以正常登录了</p>
+</li>
+<li><p>修改访问host<br>&ensp;&ensp;&ensp;8.0 此时mysql已经安装完成了，但是依旧无法链接Navicat，需要我们手动修改root用户权限才行<br>&ensp;&ensp;&ensp;8.1 登录mysql：<strong># mysql -u root -p</strong>，输入你的密码<br>&ensp;&ensp;&ensp;8.2 执行：<strong>mysql&gt;use mysql</strong>  进入名为mysql的数据库<br>&ensp;&ensp;&ensp;8.3 执行：<strong>mysql&gt;update user set host=’%’ where user=’root’</strong> 修改权限<br>&ensp;&ensp;&ensp;8.4 执行：<strong>mysql&gt;select host,user from user;</strong> 查看是否成功修改<br>&ensp;&ensp;&ensp;8.5 退出mysql，并重启服务即可正常连接Navicat了</p>
+</li>
+</ol>
+<p><strong><em>注：如果依旧不能连接并报2013错误的话可以使用ssh通道进行连接</em></strong></p>
+<ol start="9">
+<li><p>放行3306端口<br>&ensp;&ensp;&ensp;9.1执行：<strong># vim /etc/sysconfig/iptables</strong> 进入文件<br>&ensp;&ensp;&ensp;9.2将22端口那一行复制，粘贴并将22改为3306</p>
+</li>
+<li><p>至此，mysql成功安装（建议再拍一次快照哦O(∩_∩)O）！</p>
+</li>
+</ol>
+<h3 id="部署web项目到tomcat中"><a href="#部署web项目到tomcat中" class="headerlink" title="部署web项目到tomcat中"></a>部署web项目到tomcat中</h3><ol start="0">
+<li>通过上面的步骤环境已经成功搭建完了，接下来就是让自己的项目在linux中跑起来了！</li>
+<li>进入tomcat的bin目录：<strong># cd /usr/local/tomcat/bin</strong></li>
+<li>启动tomcat并打印日志：<strong># ./startup.sh &amp; tailf ../logs/catalina.out</strong></li>
+<li>在浏览器中输入：你的ip地址:8080  进入网页<br><a href="https://imgchr.com/i/eX02e1" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYMDJlMS5wbmc" alt="eX02e1.png"></a></li>
+</ol>
+<p><a href="https://imgchr.com/i/eXBimn" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYQmltbi5wbmc" alt="eXBimn.png"></a></p>
+<ol start="4">
+<li>但是第一次点击肯定是登不上的啦哈哈，因为我们还有没注册tomcat用户名<br>&ensp;&ensp;&ensp;4.1 返回命令行输入：<strong># vim tomcat/conf/tomcat-users.xml</strong> 在最后添加<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;role rolename=”manager-gui”/<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;role rolename=”manager-script”/<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;user username=”tomcat” password=”tomcat” roles=”manager-gui,manager-script”/</li>
+</ol>
+<p>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<strong><em>注：前后一定要用&lt;&gt;括起来，因博客编辑问题上面没有括起来</em></strong></p>
+<ol start="5">
+<li>返回网页输入用户名为tomcat和密码为tomcat即可成功登录</li>
+<li>导出web项目，在eclipse中右键export目标项目即可，建议保存在桌面</li>
+</ol>
+<p><a href="https://imgchr.com/i/eXr9Zn" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYcjlabi5wbmc" alt="eXr9Zn.png"></a></p>
+<p><a href="https://imgchr.com/i/eXrARU" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYckFSVS5wbmc" alt="eXrARU.png"></a></p>
+<ol start="7">
+<li>进入tomcat页面，在图示处单机浏览，选择文件并点击deploy</li>
+</ol>
+<p><a href="https://imgchr.com/i/eXrUeA" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYclVlQS5wbmc" alt="eXrUeA.png"></a></p>
+<ol start="8">
+<li>等待tomcat重启，若与图示一样start则成功，为stop则失败</li>
+</ol>
+<p><a href="https://imgchr.com/i/eXsF0A" target="_blank" rel="noopener"><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9zMi5heDF4LmNvbS8yMDE5LzA4LzEwL2VYc0YwQS5wbmc" alt="eXsF0A.png"></a></p>
+<h3 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h3><p>&ensp;&ensp;&ensp;&ensp;感谢您观看本文章，希望能给您带来些许帮助，在学习的路上一起加油哦O(∩_∩)O</p>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%80%BB%E7%BB%93/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            大话设计模式读后感(1-15章)</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/07/26/%E6%96%B0%E5%BB%BA%E5%8D%9A%E5%AE%A2%E8%BF%87%E7%A8%8B%E6%80%BB%E7%BB%93/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">新建博客过程总结
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/08/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%80%BB%E7%BB%93/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            大话设计模式读后感(1-15章)</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2019/07/26/%E6%96%B0%E5%BB%BA%E5%8D%9A%E5%AE%A2%E8%BF%87%E7%A8%8B%E6%80%BB%E7%BB%93/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">新建博客过程总结
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux-简介"><span class="toc-text">Linux 简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#linux系统目录介绍"><span class="toc-text">linux系统目录介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XShell"><span class="toc-text">XShell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Filezilla-工具使用"><span class="toc-text">Filezilla 工具使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JDK的安装（jdk8）"><span class="toc-text">JDK的安装（jdk8）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tomcat的安装（tomcat7）"><span class="toc-text">tomcat的安装（tomcat7）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL的安装"><span class="toc-text">MySQL的安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#部署web项目到tomcat中"><span class="toc-text">部署web项目到tomcat中</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#写在最后"><span class="toc-text">写在最后</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

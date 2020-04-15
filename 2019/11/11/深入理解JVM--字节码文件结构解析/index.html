@@ -157,6 +157,12 @@
 </li>
 <li><strong>类中附加属性的个数（占据2个字节）</strong></li>
 <li><strong>附加属性表</strong></li>
+<li><strong><em>补充：</em></strong><ul>
+<li><font color=#00aeef >很多人认为在类中定义的非静态变量是就地完成赋值的，其实不是。</font> 总所周知，如果我们在类中没有定义构造方法，JVM会自动生成默认的构造方法，<strong><em>实际上分析Code中的字节码，我们可以得到非静态属性变量的赋值其实是在构造方法&lt;.init&gt;中通过执行码完成的</em></strong>。 如果有类中多个构造方法，那么所有的构造方法都会有对非静态属性变量赋值的执行码，即 <strong><em>无论执行哪个构造方法，都会在构造方法中给类中的非静态变量赋值</em></strong>。</li>
+<li>但是<font color=#00aeef >静态变量不同</font>，同样分析Code中的字节码可以知道，<strong><em>静态变量的赋值与静态代码块的执行都是在JVM自动生成的&lt;.cliinit &gt;(我们不可见)方法中完成</em></strong></li>
+<li>比如以下案例：<font color=#00aeef >str与x的实际赋值其实是在JVM自动生成的构造方法中完成</font>，而不是在定义处完成的，而 <strong><em>如果有多个构造方法，则相同的赋值执行码会在所有构造方法中存在</em></strong>；但是<font color=#00aeef >static静态块的执行和in变量的赋值则一定是在JVM自动生成的&lt;.clinit&gt;方法中完成</font></li>
+</ul>
+</li>
 <li>博主自己写的小程序，可以实现对一些简单类的反编译，仅供参考学习哦O(∩_∩)O<ul>
 <li><a href="https://pan.baidu.com/s/1GyUoLoTvcrTYg4id1X11-Q" target="_blank" rel="noopener">https://pan.baidu.com/s/1GyUoLoTvcrTYg4id1X11-Q</a></li>
 <li>6ry1</li>

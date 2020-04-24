@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>深入理解JVM--垃圾回收器-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">深入理解JVM--垃圾回收器</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-04-24</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="1、垃圾回收主要对象"><a href="#1、垃圾回收主要对象" class="headerlink" title="1、垃圾回收主要对象"></a>1、垃圾回收主要对象</h3><ol>
+<li><strong><em>堆（Heap）</em></strong> ：Java虚拟机管理内存中最大的一块<ol>
+<li>堆里面存放对象的实例</li>
+<li>GC的主要工作区域</li>
+<li>线程共享</li>
+<li>堆主要由<font color=#00aeef >分代算法（Generational）</font> 分为新生代和老年代<ol>
+<li><strong><em>新生代(Young Generation)</em></strong><ol>
+<li>新生成的对象都放在新生代，新生代用<font color=#00aeef >复制算法</font>进行GC（理论上，新生代对象生命周期非常短，所以适合复制算法）</li>
+<li>新生代分为3个区：一个Eden区，两个Survivor区（可以通过参数设置Survivor个数），对象在Eden区生成，当<strong>Eden区满时，进行GC，把还存活的对象放入一个Survivor区（From Survivor），而这个Survivor区满了之后，把存活的对象放入另一个Survivor区（To Survivor），第二个Survivor区也满了之后，JVM可能会将从第一个Survivor区复制过来的且还存活的对象复制到老年代（根据对象年龄决定，可用参数进行设置）</strong>，2个Survivor完全对称，轮流替换</li>
+<li>一般情况下，<strong>Eden区和2个Survivor区的内存占比是8:1:1</strong>，也就是10%的空间会浪费，可以根据GC Log的信息调整比例的大小</li>
+</ol>
+</li>
+<li><strong><em>老年代(Old Generation)</em></strong> ：在新生代中经历了多次（具体看虚拟机配置的阀值）GC后仍然存活下来的对象会进入老年代中。老年代中的对象生命周期较长，存活率比较高，<strong>老年代中进行GC的频率相对而言较低，而且回收的速度也比较慢，所以老年代一般使用 <font color=#00aeef >标记-清除（Mark-Sweep）</font> 或 <font color=#00aeef >标记-整理（Mark-Compact）</font> 算法</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>方法区：</em></strong> <ol>
+<li>由于GC“性价比”较低，所以JVM虚拟机规范表示可以不在方法区实现GC，但是主流商业JVM都有在方法区实现GC，一般使用一般使用标记-清除（Mark-Sweep）或标记-整理（Mark-Compact） 算法</li>
+<li>主要回收两部分内容：废弃常量与无用类</li>
+<li>类回收需要满足以下条件：<ol>
+<li>该类的所有实例都已被GC，也就是JVM种不存在该类的任何实例</li>
+<li>加载该类的ClassLoader已被GC</li>
+<li>该类对应的Java.lang.Class对象没有任何地方被引用，如不能在任何地方通过反射访问该类的方法</li>
+<li><strong><em>tips：由于JVM会一直引用3个类加载器（根，拓展，系统），而类加载器又会一直引用自身所加载的类，所以JVM只可能回收由我们自己定义的类加载器所加载的类！</em></strong></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="2、垃圾判断算法"><a href="#2、垃圾判断算法" class="headerlink" title="2、垃圾判断算法"></a>2、垃圾判断算法</h3><ol>
+<li><strong><em>引用计数算法（Reference    Counting）：</em></strong><ol>
+<li>给对象添加一个引用计数器，当有一个地方引用他，计数器加1，当引用失效，计数器减1，任何时刻计数器为0的对象就不可能再被使用</li>
+<li><strong>引用计数算法无法解决对象循环引用的问题</strong></li>
+</ol>
+</li>
+<li><strong><em>根搜索算法（GC    Roots    Tracing）：</em></strong><ol>
+<li><strong>在实际的生产语言（Java、C#等）中，都是使用根搜索算法来判断对象是否存活</strong></li>
+<li>算法的基本思路就是通过一系列的称为“GC    Roots”的点作为起始向下搜索，当一个对象到GC    Roots没有任何引用链（Reference Chain）相连，则证明此对象是不可用的</li>
+<li><strong>进行枚举根节点时，并不需要一个不漏的检查完所有执行上下文和全局的引用位置</strong>，虚拟机应当是有办法得知哪些地方存放着对象引用，在HotSpot的视线中，是<strong>使用一组称为OopMap的数据结构来达到这个目的</strong>的</li>
+<li>在Java语言中，GC    Roots包括：<ol>
+<li>在VM栈（帧中的本地变量）中的引用</li>
+<li>方法区中的静态引用</li>
+<li>JNI（即一般所说的Native方法）中的引用</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="3、GC算法"><a href="#3、GC算法" class="headerlink" title="3、GC算法"></a>3、GC算法</h3><ol>
+<li><strong><em>标记-清除算法（Mark-Sweep）：</em></strong><ol>
+<li><strong>算法分为“标记”和“清除”2个阶段，首先标记处所有需要回收的对象，然后清除所有需要回收的对象</strong></li>
+<li>存在的问题：<font color=#00aeef >效率问题</font>，因为需要扫描所有对象，堆越大，效率越慢，所以标记和清除效率都不高</li>
+<li>存在的问题：<font color=#00aeef >空间问题</font>，标记清理之后会产生大量不连续的内存碎片，空间碎片太多可能导致后续使用过程中无法找到连续内存而提前出发下一次GC，GC次数越多，碎片越严重</li>
+</ol>
+</li>
+<li><strong><em>标记-整理算法（Mark-Compact）：</em></strong><ol>
+<li>与标记-清除算法过程相似，只是<strong>不再是直接清理，而是将所有存活对象往一端移动，最后清理掉这端边界以外的内存</strong></li>
+<li>与标记-清除算法相比，<strong>优化了空间问题，不会再产生内存碎片，但是效率降低了</strong></li>
+</ol>
+</li>
+<li><strong><em>复制算法（Copying）：</em></strong><ol>
+<li>将可用内存区域划分为2块，每次只使用其中的一块，当半区内存用完了，仅将还存活的对象复制到另一块上面，然后将原半区整块内存空间一次性清理掉</li>
+<li>复制算法使得每次内存回收都是对整个半区的回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针（<font color=#00aeef >指针碰撞</font>），按需分配内存即可，<strong>实现简单，运行高效。</strong></li>
+<li><strong>复制算法的代价是将内存缩小为原来的一半，代价高昂，而且复制算法在对象存活率高的时候，效率有所下降，所以一般使用在新生代而不是老年代</strong></li>
+</ol>
+</li>
+<li><strong><em>分代算法（Generational）：</em></strong> 综合前面几种算法的优缺点，针对不同的生命周期对象采用不同的算法<ol>
+<li><strong>分代算法将堆中的内存分为年轻代和老年代，然后在不同的内存中使用上诉所讲的不同算法实现的垃圾回收器！</strong></li>
+<li>当前商业虚拟机都是采用分代算法</li>
+</ol>
+</li>
+</ol>
+<h3 id="4、垃圾回收器"><a href="#4、垃圾回收器" class="headerlink" title="4、垃圾回收器"></a>4、垃圾回收器</h3><p><strong><em>可以看作GC算法的具体实现</em></strong></p>
+<ol>
+<li><strong><em>GC的时机：</em></strong> GC从时机上分为2种，Scavenge GC和Full GC<ol>
+<li><strong><em>Scavenge GC（Minor GC）</em></strong><ol>
+<li>触发时机：新对象生成时，Eden空间满了</li>
+<li>理论上Eden上大多数对象会在Scavenge GC中回收，复制算法执行效率会很高，Scavenge GC执行时间较短</li>
+</ol>
+</li>
+<li><strong><em>Full GC：</em></strong><ol>
+<li>对整个JVM进行整理，包括新生代，老年代和元空间</li>
+<li>主要触发时机：1）Old满了，2）meta space满了，3）System.gc()</li>
+<li><strong>效率很低，尽量减少Full GC</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>内存回收的概念：</em></strong> GC要做的就是将那些dead的对象所占用的内存回收掉<ol>
+<li>HotSpot认为没有引用的对象是dead的，HotSpot将引用分为4种：<strong>Strong（我们自己new的对象），Soft，Weak，Phantom</strong></li>
+<li>在Full GC时会对Reference类型的引用做特殊处理<ol>
+<li>Soft：内存不够一定会被GC，长时间不用也会被GC</li>
+<li>Weak：一定会被GC，当mark为dead时，会在ReferenceQueue中通知</li>
+<li>Phantom：本来就没引用，当从JVM Heap释放时会通知</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>GC的“并行”和“并发”</em></strong><ol>
+<li><strong>并行（Parallel）</strong>：指多个收集器线程同时工作，但是用户线程处于等待状态</li>
+<li><strong>并发（Concurrent）</strong>：指收集器在工作的同时，可以允许用户线程工作</li>
+<li><strong><em>tips：并发并不代表解决了GC停顿的问题，在关键的步骤还是要停顿。比如收集器在标记垃圾的时候，但在清除垃圾的时候，GC线程和用户线程可以一起执行</em></strong></li>
+</ol>
+</li>
+<li><strong><em>安全点（Safepoint）与安全区域（SafeRegion）</em></strong><ol>
+<li><strong><em>安全点（Safepoint）</em></strong><ol>
+<li>在OopMap的协助下，HotSpot可以快速且准确的完成GC Roots枚举，但一个问题随之而来，可能导致引用关系变化，或者说使OopMap内容变化的指令非常多，为每一条指令都生成对应的OopMap需要大量的额外空间，这样GC的成本会更高。</li>
+<li>实际上，HotSpot并没有为每条指令都生成OopMap，而只是在特定位置记录这些信息，这些地方就称为安全点，<strong>即程序执行时并不是在所有地方都能停顿下来进行GC，只有在到达安全点时才能暂停</strong></li>
+<li>另一个需要考虑的问题就是<strong>如何让GC时让所有线程都“跑”到最近的安全点再停顿下来</strong>，JVM有2种解决方法<ol>
+<li><strong><em>抢占式中断（Preemptive Suspension）：</em></strong> 不需要线程的执行代码主动区配合，在GC发生时，首先把所有线程暂停，如果有线程不在安全点上，则恢复该线程让他跑到安全点上</li>
+<li><strong><em>主动式中断（Voluntary Suspension）：</em></strong> 当GC需要中断线程的时候，不直接对线程操作，仅仅设置一个标志，各个线程执行时主动区轮询这个标志，发现中断标志时则自己挂起。轮询标志的地方和安全点是重合的，另外再加上创建对象需要分配内存的方法。</li>
+<li><strong><em>简单的概括：</em></strong> 抢占式中断就是先暂停所有线程，然后让没到安全点的线程跑到安全点上，而主动式中断则是线程每到一个安全点就判断一下GC是否在执行，如果GC在执行则自动挂起。</li>
+<li><strong><em>tips：现在几乎没有虚拟机采用抢占式中断来暂停线程从而响应GC事件</em></strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>安全区域（SafeRegion）</em></strong><ol>
+<li>虽然表面上Safepoint能完美解决线程如何进入GC的问题，但实际情况却不一定，如果<strong>当线程处于不执行状态（如sleep或blocked）时，线程不能自己进入安全点</strong>，所以这种情况，就需要安全区域来解决了</li>
+<li>当线程执行到SafeRegion的代码时，会标识自己进入了SafeRegion，这样当GC时，就不用管那些进入SafeRegion状态的线程，<strong>当线程要离开时，会检查系统是否已经完成了根节点枚举（或是整个GC过程），如果完成，则正常离开，否则原地等待</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>Serial收集器</em></strong><ol>
+<li><strong>最早的收集器，<font color=#00aeef >单线程</font>进行GC</strong></li>
+<li>收集时会暂停所有工作进程（<font color=#00aeef >Stop the Word，简称STW</font>）</li>
+<li>新生代和老年代都可以使用</li>
+<li>在新生代使用复制算法，在老年代使用标记-整理算法</li>
+<li>因为是单线程GC，没有多线程切换的额外开销，简单实用</li>
+<li>Hotspot Client模式缺省的收集器</li>
+</ol>
+</li>
+<li><strong><em>Serial Old收集器：</em></strong> 单线程收集器，使用标记-整理算法，是老年代的收集器</li>
+<li><strong><em>ParNew收集器：</em></strong><ol>
+<li><strong>Serial收集器在新生代的多线程版本</strong></li>
+<li>使用复制算法（因为只针对新生代）</li>
+<li><strong><em>只有在多CPU的环境下，效率才会比Serial高</em></strong></li>
+<li>可以通过 <font color=#00aeef >-XX:ParallelGCThreads</font> 来控制GC线程数的多少。需要结合具体CPU个数</li>
+<li>Server模式下新生代的缺省收集器</li>
+</ol>
+</li>
+<li><strong><em>Parallel Scavenge收集器</em></strong><ol>
+<li>与ParNew相同的是，都是多线程处理器，也使用复制算法</li>
+<li>与ParNew不同的是，它是<strong>以吞吐量最大化（GC时间占总运行时间最小）为目标</strong>实现，它允许较长时间的STW以获得最大吞吐量</li>
+</ol>
+</li>
+<li><strong><em>Parallel Old收集器：</em></strong> 老年代版本吞吐量优先处理器，使用多线程和标记-整理算法</li>
+<li><strong><em>CMS（Concurrent Mark-Sweep）收集器</em></strong><ol>
+<li><strong>追求最短停顿时间，非常适合Web应用</strong></li>
+<li>使用<font color=#00aeef >标记-清除算法（Mark-Sweep）</font>，只针对老年代，一般结合ParNew使用</li>
+<li>只有在多CPU环境下才有意义</li>
+<li>Concurrent，GC线程和用户线程并发工作（尽量并发）</li>
+<li>使用CMS并不能使GC效率最高，但它能尽可能降低服务停顿时间</li>
+<li>使用参数 <font color=#00aeef >-XX:+UseConcMarkSweepGC</font>告诉JVM使用CMS收集器</li>
+<li><strong><em>CMS收集器步骤</em></strong><ol>
+<li><strong>初始标记（Initial Mark）：</strong> <font color=#00aeef >会触发STW</font>，标记老年代中那些直接被GC root引用或者被年轻代存活对象所引用的所有对象</li>
+<li><strong>并发标记（Concurrent Mark）：</strong> 根据上个阶段找到的GC roots遍历老年代，标记所有存活的对象，由于与用户线程并发执行，所以在标记期间用户线程可能会改变一些引用</li>
+<li><strong>并发预清理（Concurrent Preclean）：</strong> 同样与用户线程并发执行，查找前一阶段执行过程中,从新生代晋升或新分配或被更新的对象。通过并发地重新扫描这些对象，预清理阶段可以减少下一个stop-the-world 重新标记阶段的工作量</li>
+<li><strong>可终止预清理（Concurrent Abortable Preclean）：</strong>  并发可中止的预清理阶段。这个阶段其实跟上一个阶段做的东西一样，也是为了减少下一个STW重新标记阶段的工作量。增加这一阶段是为了让我们可以控制这个阶段的结束时机，比如扫描多长时间（默认5秒）或者Eden区使用占比达到期望比例（默认50%）就结束本阶段</li>
+<li><strong>重标记（Final Remark）：</strong> <font color=#00aeef >第二个触发STW的阶段</font>，由于之前的阶段是并发执行的，GC可能跟不上用户线程的变化，所以需要重新标记老年代中存活的对象</li>
+<li><strong>并发清理（Concurrent Sweep）：</strong> 并发，清除前几个阶段标记的对象</li>
+<li><strong>并发重置（Concurrent Reset）：</strong> 并发，重设CMS内部的数据结构，为下次的GC做准备</li>
+</ol>
+</li>
+<li><strong><em>CMS优点：</em></strong> 并发收集，低停顿，Oracle公司的一些官方文档中也称之为并发低停顿收集器（Concurrent Low Pause Collector）</li>
+<li><strong><em>CMS缺点：</em></strong><ol>
+<li>CMS以牺牲CPU资源为代价来减少用户线程的停顿。<strong>当CPU个数少于4时，可能对吞吐量影响非常大</strong></li>
+<li>CMS在并发清理过程中，用户线程还在跑，此时需要预留一部分空间给用户进程</li>
+<li>CMS用Mark-Sweep，会带来空间碎片问题，碎片过多可能会导致频繁触发Full GC</li>
+<li>CMS无法处理<strong>浮动垃圾</strong>，可能出现“Concurrnet Mode Failure”失败而导致Full GC，要是CMS运行期间预留的内存无法满足程序需要，虚拟机会启动后背预案：临时启用<font color=#00aeef >Serial Old</font>收集器重新进行老年代收集，这样停顿时间就很长了</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>G1收集器：内容比较多，下一篇博客</em></strong></li>
+</ol>
+<h3 id="5、常用JVM启动参数"><a href="#5、常用JVM启动参数" class="headerlink" title="5、常用JVM启动参数"></a>5、常用JVM启动参数</h3><p><img src="https://img-blog.csdnimg.cn/20200424130431672.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200424130500977.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200424130533800.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2020042413055923.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/04/20/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-JVM%E7%BB%93%E6%9E%84/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--JVM结构
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/04/20/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-JVM%E7%BB%93%E6%9E%84/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM--JVM结构
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、垃圾回收主要对象"><span class="toc-text">1、垃圾回收主要对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、垃圾判断算法"><span class="toc-text">2、垃圾判断算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、GC算法"><span class="toc-text">3、GC算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4、垃圾回收器"><span class="toc-text">4、垃圾回收器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5、常用JVM启动参数"><span class="toc-text">5、常用JVM启动参数</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

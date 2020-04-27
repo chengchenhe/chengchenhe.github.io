@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>深入理解JVM-G1垃圾收集器-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">深入理解JVM-G1垃圾收集器</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-04-27</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p>@<a href="深入理解JVM--G1垃圾收集器">TOC</a></p>
+<ol>
+<li><strong><em>吞吐量：</em></strong><ol>
+<li><strong>吞吐量关注的是，在一定时间内，最大化一个应用的工作量</strong></li>
+<li>用一段时间内同一个事务（或者任务，请求）完成的次数（tps）来衡量系统吞吐量的好坏</li>
+<li>对于关注吞吐量的系统，卡顿是可以接受的，因为这个系统关注的是长时间大量任务的执行能力，单次快速的响应不值得考虑</li>
+</ol>
+</li>
+<li><strong><em>响应能力：</em></strong><ol>
+<li>响应能力指的是<strong>一个程序或系统对一个请求能否及时响应</strong>，比如：<ol>
+<li>一个桌面UI是否能快速响应一个事件</li>
+<li>一个网站能多快返回一个系统请求</li>
+<li>数据库能多快查找目标数据</li>
+</ol>
+</li>
+<li>对于这类对响应时间敏感的产品，长时间停顿是无法接受的</li>
+</ol>
+</li>
+<li><strong><em>G1收集器设计目标：</em></strong><ol>
+<li>能与应用线程一起工作，几乎不需要STW（Stop The World）</li>
+<li>整理剩余空间，不需要产生内存碎片（CMS只有在Full GC时，用STW整理内存碎片）</li>
+<li>GC停顿更加可控</li>
+<li>GC不需要额外的内存空间（CMS需要分配额外的内存空间处理浮动垃圾）</li>
+<li><strong>更大的吞吐量和更小的响应时间</strong></li>
+<li><strong><em>G1的设计计划是替换掉CMS</em></strong><ol>
+<li>G1在某些方面比CMS更有优势，比如CMS采用标记-清除算法（Mark-Sweep），会产生大量的内存碎片，而G1收集器采用复制算法，不会产生这个问题 </li>
+<li>G1提供了更多的手段，使得GC停顿时间更加可控</li>
+<li>Eden、Survivor、Old区不再固定，在内存使用效率上更灵活</li>
+<li>G1在回收内存后买上做合并空闲内存的操作，而CMS默认是在STW的时候做</li>
+<li>G1可以在新生代和老年代使用，而CMS只能在老年代使用</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>G1收集器重要概念：</em></strong><ol>
+<li>G1收集器是一个面向服务端的垃圾收集器，适用于多核处理器，大内存的服务端系统</li>
+<li>它满足短时间GC停顿的同时还能达到较高的吞吐量</li>
+<li>JDK7以上版本适用</li>
+<li><strong><font color=#00aeef >分区（Region）</font></strong>：<ol>
+<li>G1采用了不同的策略来解决并行、串行、内存碎片、GC停顿时间等问题——G1将<strong>整个堆</strong>分成相同大小的分区，每个分区都有一个分代的角色：<strong><em>Eden、Survivor、Old</em></strong></li>
+<li>G1对每个角色的数量没有做强制限定，每种分代的内存大小，可以动态分配</li>
+<li>G1从多个Region中复制存活的对象，然后集中放入一个Region中，同时整理，清除内存（复制算法）</li>
+<li>每个分区既可以是新生代也可以是老年代，但是同一时间只能属于某个代，年轻代、幸存区、老年代这些概念都还存在，成为逻辑上的概念，这样方便复用之前分代框架的逻辑</li>
+<li>G1依然是在新生代满了之后，对新生代进行回收，至于新生代也采取分区机制的原因，则是因为这样与老年代策略统一，方便调整代的大小</li>
+<li><strong>除了Eden、Survivor、Old区，G1中还有一块特殊的区域，叫<font color=#00aeef >Humongous</font>区</strong><ol>
+<li>如果一个对象占用空间达到或超过了分区的50%，G1就会认为该对象是巨型对象，这些巨型对象会默认分配到老年代</li>
+<li>但是如果这是一个短期存在的巨型对象，就会对垃圾收集器产生负面影响，所以G1专门划分了一个Humongous区，来存放这些巨型对象，如果一个H区装不下该对象，则G1会寻找连续的H区来存储，因此 <strong>有时候会因为找不到而不得不进行Full GC</strong></li>
+</ol>
+</li>
+<li><strong>G1使用了停顿时间可预测模型，来满足用户设定的GC停顿时间，根据用户设定的停顿时间，GC自动选择哪些Region要清除，一次清除多少个Region</strong></li>
+<li><strong>由于物理内存上不需要连续，导致有的分区垃圾对象较多，有些分区较少，<font color=#00aeef >G1会优先回收垃圾对象较多的区域</font>，这也就是G1名字的由来，即首先收集垃圾较多的区域</strong></li>
+<li>使用G1时堆内存分配的大概示意图：<br><img src="https://img-blog.csdnimg.cn/20200425113353904.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+</ol>
+</li>
+<li>G1还是一种带压缩的收集器，即将一个存活的对象从一个分区拷贝到另一个分区时，这个过程是一个局部压缩的过程</li>
+<li><strong>收集集合（CSet）：</strong> <strong>一组可被回收的分区的集合（告诉垃圾收集器哪些分区中有大量垃圾可以进行垃圾回收）</strong>，从CSet中存活的数据会在GC过程中移动到另一个可用分区，CSet中的分区可以来自Eden、Survivor、Old</li>
+<li><strong>已记忆集合（RSet）</strong> ：<ol>
+<li><strong>RSet记录了Region中的对象引用本Region中对象的关系（如在A分区中的对象a引用了B分区中的对象b，则在B分区中的RSet会有一条记录，记录了该引用）</strong>，属于points-into结构（谁引用了我的对象），RSet的价值在于使得垃圾收集器不需要扫描整个堆找到谁引用了当前分区中的对象，只需要扫描RSet即可</li>
+<li><strong>RSet并不会记录新生代对象之间的引用，原因是每次进行GC都会对所有新生代对象进行扫描，所以RSet只需要记录老年代到新生代的引用即可！</strong></li>
+<li>这个RSet其实是一个HashTable，key是别的Region的起始地址，value是一个集合，里面的元素是card table的index。举例来说，如果Region A的RSet里有一项key是Region B，value里有index为1234的card，它的意思就是Region B的一个card中有引用指向Region A。所以对于Region A来说，该RSet记录了points-into的关系；而card-table仍然记录了points-into的关系（看不懂，以后可能会懂？/(ㄒoㄒ)/~~）</li>
+</ol>
+</li>
+<li><strong><em>G1的两种GC模式</em></strong><ol>
+<li><strong>Young GC（STW）</strong><ol>
+<li>当Eden区满了后进行，选用所有年轻代里的Region，通过控制年轻代Region个数，即年轻代内存大小，来控制Young GC内存开销，进行完Young GC后，所有年轻代的Region都会被回收</li>
+<li>Young GC步骤：<ol>
+<li>根扫描：静态和本地对象被扫描</li>
+<li>更新RSet：处理dirty card更新RSet</li>
+<li>处理RSet：检测年轻代中指向老年代的对象</li>
+<li>对象拷贝：将年轻代代中存活的对象拷贝到Survivor/Old区中</li>
+<li>处理引用队列</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>Mixed GC（STW）</strong><ol>
+<li>选定所有年轻代里的Region，外加根据<font color=#00aeef >global concurrent marking</font>统计得出收益最高的若干老年代Region。在用户指定的开销目标范围内尽量选择收益较高的老年代Region</li>
+<li><strong>Mixed GC不是Full GC</strong>，它只能回收部分老年代的Region，<strong>如果Mixed GC的速度无法跟上程序分配内存的速度，就会使用Serial Old（Full GC）来收集整个GC heap</strong>，所以本质上，Mixed GC不是Full GC</li>
+<li><strong>global concurrent marking</strong>：执行过程类似CMS，但在G1 GC中，只为Mixed GC提供标记作用，不是GC过程中必要环节，具体步骤如下：<ol>
+<li><strong>初始标记（Initial Mark）</strong>：标记了从GC Root可以直接到达的对象，因为共用Young GC的暂停，所以可以说global concurrent marking伴随Young GC发生</li>
+<li><strong>并发标记（Concurrent Mark）</strong>：并发，从GC Roots开始对Heap中的对象进行标记，收集各个Region中对象存活信息</li>
+<li><strong>重新标记（Remark）</strong>:STW，标记那些在并发过程中发生改变的对象</li>
+<li><strong>清理（Clean）</strong>：清除<strong>空Region（里面没有任何存活对象的Region）</strong>，加入到Free list，不需要STW</li>
+</ol>
+</li>
+<li><strong>G1会在Young GC和Mixed GC间不断切换运行，同时定期做并发标记，在实在赶不上对象创建速度的情况下会执行Full GC（Serial Old）</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong><em>三色标记算法</em></strong><ol>
+<li>提到并发标记，我们就不得不的了解并发标记的三色标记算法。它是描述追踪器和回收器的一种有效方法，利用它可以推演回收的正确性</li>
+<li><strong>三色标记算法将对象分为三种类型</strong>：<ol>
+<li>黑色：根对象，或者该对象与它的子对象都被扫描过（对象被标记了，且它所有的Field都被扫描过了）</li>
+<li>灰色：对象本身被扫描过了，但是还没有扫描过它的子对象</li>
+<li>白色：未被扫描的对象，扫描完所有对象后，最终被标记为白色的对象为不可达对象，即垃圾对象</li>
+</ol>
+</li>
+<li>三色标记算法图示<br> <img src="https://img-blog.csdnimg.cn/20200426120452789.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>三色标记算法的对象丢失问题<br> <img src="https://img-blog.csdnimg.cn/20200426121752792.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li><strong><em>STAB（解决三色算法问题）</em></strong><pre><code>1. 在开始标记时生成一个快照图，标记存活对象
+2. 在并发标记时将所有改变的对象入队（在write barrier里将所有旧的引用所指向的对象变为非白的）
+3. 在三色算法并发标记的阶段，对于从gray对象移除的目标引用对象标记为gray，对于black引用的新产生的对象标记为black
+4. 在GC收集的时候，所有新生代的对象都被认为是活的除此以外不可到达的对象都认为是垃圾对象
+5. 可能存在浮动垃圾，下次GC回收</code></pre></li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM-垃圾收集器
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">深入理解JVM-垃圾收集器
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

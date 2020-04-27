@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>深入理解JVM--垃圾回收器-何承宸的个人网站</title>
+    <title>深入理解JVM-垃圾收集器-何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -78,7 +78,7 @@
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
         
-        <h1 class="mt-4 article-title page-title">深入理解JVM--垃圾回收器</h1>
+        <h1 class="mt-4 article-title page-title">深入理解JVM-垃圾收集器</h1>
         
         <p class="lead text-gray mt-3">By Anonymous; Published on 2020-04-24</p>
         
@@ -101,14 +101,14 @@
 <li>堆里面存放对象的实例</li>
 <li>GC的主要工作区域</li>
 <li>线程共享</li>
-<li>堆主要由<font color=#00aeef >分代算法（Generational）</font> 分为新生代和老年代<ol>
-<li><strong><em>新生代(Young Generation)</em></strong><ol>
-<li>新生成的对象都放在新生代，新生代用<font color=#00aeef >复制算法</font>进行GC（理论上，新生代对象生命周期非常短，所以适合复制算法）</li>
-<li>新生代分为3个区：一个Eden区，两个Survivor区（可以通过参数设置Survivor个数），对象在Eden区生成，当<strong>Eden区满时，进行GC，把还存活的对象放入一个Survivor区（From Survivor），而这个Survivor区满了之后，把存活的对象放入另一个Survivor区（To Survivor），第二个Survivor区也满了之后，JVM可能会将从第一个Survivor区复制过来的且还存活的对象复制到老年代（根据对象年龄决定，可用参数进行设置）</strong>，2个Survivor完全对称，轮流替换</li>
-<li>一般情况下，<strong>Eden区和2个Survivor区的内存占比是8:1:1</strong>，也就是10%的空间会浪费，可以根据GC Log的信息调整比例的大小</li>
+<li>堆主要由分代算法（Generational）分为新生代和老年代<ol>
+<li><strong>新生代(Young Generation)</strong><ol>
+<li>新生成的对象都放在新生代，新生代用复制算法进行GC（理论上，新生代对象生命周期非常短，所以适合复制算法）</li>
+<li>新生代分为3个区：一个Eden区，两个Survivor区（可以通过参数设置Survivor个数），对象在Eden区生成，当Eden区满时，进行GC，把还存活的对象放入一个Survivor区（From Survivor），而这个Survivor区满了之后，把存活的对象放入另一个Survivor区（To Survivor），第二个Survivor区也满了之后，JVM可能会将从第一个Survivor区复制过来的且还存活的对象复制到老年代（根据对象年龄决定，可用参数进行设置），2个Survivor完全对称，轮流替换</li>
+<li>一般情况下，Eden区和2个Survivor区的内存占比是8:1:1，也就是10%的空间会浪费，可以根据GC Log的信息调整比例的大小</li>
 </ol>
 </li>
-<li><strong><em>老年代(Old Generation)</em></strong> ：在新生代中经历了多次（具体看虚拟机配置的阀值）GC后仍然存活下来的对象会进入老年代中。老年代中的对象生命周期较长，存活率比较高，<strong>老年代中进行GC的频率相对而言较低，而且回收的速度也比较慢，所以老年代一般使用 <font color=#00aeef >标记-清除（Mark-Sweep）</font> 或 <font color=#00aeef >标记-整理（Mark-Compact）</font> 算法</strong></li>
+<li><strong>老年代(Old Generation)</strong> ：在新生代中经历了多次（具体看虚拟机配置的阀值）GC后仍然存活下来的对象会进入老年代中。老年代中的对象生命周期较长，存活率比较高，老年代中进行GC的频率相对而言较低，而且回收的速度也比较慢，所以老年代一般使用标记-清除（Mark-Sweep）或标记-整理（Mark-Compact）算法</li>
 </ol>
 </li>
 </ol>
@@ -129,19 +129,19 @@
 <h3 id="2、垃圾判断算法"><a href="#2、垃圾判断算法" class="headerlink" title="2、垃圾判断算法"></a>2、垃圾判断算法</h3><ol>
 <li><strong><em>引用计数算法（Reference    Counting）：</em></strong><ol>
 <li>给对象添加一个引用计数器，当有一个地方引用他，计数器加1，当引用失效，计数器减1，任何时刻计数器为0的对象就不可能再被使用</li>
-<li><strong>引用计数算法无法解决对象循环引用的问题</strong></li>
+<li>引用计数算法无法解决对象循环引用的问题</li>
 </ol>
 </li>
 <li><strong><em>根搜索算法（GC    Roots    Tracing）：</em></strong><ol>
-<li><strong>在实际的生产语言（Java、C#等）中，都是使用根搜索算法来判断对象是否存活</strong></li>
 <li>算法的基本思路就是通过一系列的称为“GC    Roots”的点作为起始向下搜索，当一个对象到GC    Roots没有任何引用链（Reference Chain）相连，则证明此对象是不可用的</li>
-<li><strong>进行枚举根节点时，并不需要一个不漏的检查完所有执行上下文和全局的引用位置</strong>，虚拟机应当是有办法得知哪些地方存放着对象引用，在HotSpot的视线中，是<strong>使用一组称为OopMap的数据结构来达到这个目的</strong>的</li>
 <li>在Java语言中，GC    Roots包括：<ol>
 <li>在VM栈（帧中的本地变量）中的引用</li>
 <li>方法区中的静态引用</li>
 <li>JNI（即一般所说的Native方法）中的引用</li>
 </ol>
 </li>
+<li><strong>进行枚举根节点时，并不需要一个不漏的检查完所有执行上下文和全局的引用位置，在HotSpot的虚拟机中，虚拟机使用一组称为OopMap的数据结构来存放对象引用</strong></li>
+<li><strong>在实际的生产语言（Java、C#等）中，都是使用根搜索算法来判断对象是否存活</strong></li>
 </ol>
 </li>
 </ol>
@@ -165,11 +165,11 @@
 </li>
 <li><strong><em>分代算法（Generational）：</em></strong> 综合前面几种算法的优缺点，针对不同的生命周期对象采用不同的算法<ol>
 <li><strong>分代算法将堆中的内存分为年轻代和老年代，然后在不同的内存中使用上诉所讲的不同算法实现的垃圾回收器！</strong></li>
-<li>当前商业虚拟机都是采用分代算法</li>
+<li>当前商业虚拟机都是采用分代算法<h3 id="4、垃圾回收器"><a href="#4、垃圾回收器" class="headerlink" title="4、垃圾回收器"></a>4、垃圾回收器</h3></li>
 </ol>
 </li>
 </ol>
-<h3 id="4、垃圾回收器"><a href="#4、垃圾回收器" class="headerlink" title="4、垃圾回收器"></a>4、垃圾回收器</h3><p><strong><em>可以看作GC算法的具体实现</em></strong></p>
+<p><strong><em>可以看作GC算法的具体实现</em></strong></p>
 <ol>
 <li><strong><em>GC的时机：</em></strong> GC从时机上分为2种，Scavenge GC和Full GC<ol>
 <li><strong><em>Scavenge GC（Minor GC）</em></strong><ol>
@@ -186,7 +186,7 @@
 </ol>
 </li>
 <li><strong><em>内存回收的概念：</em></strong> GC要做的就是将那些dead的对象所占用的内存回收掉<ol>
-<li>HotSpot认为没有引用的对象是dead的，HotSpot将引用分为4种：<strong>Strong（我们自己new的对象），Soft，Weak，Phantom</strong></li>
+<li>HotSpot认为没有引用的对象是dead的，HotSpot将引用分为4种：<strong>Strong（例如我们自己new的对象），Soft，Weak，Phantom</strong></li>
 <li>在Full GC时会对Reference类型的引用做特殊处理<ol>
 <li>Soft：内存不够一定会被GC，长时间不用也会被GC</li>
 <li>Weak：一定会被GC，当mark为dead时，会在ReferenceQueue中通知</li>
@@ -202,7 +202,7 @@
 </ol>
 </li>
 <li><strong><em>安全点（Safepoint）与安全区域（SafeRegion）</em></strong><ol>
-<li><strong><em>安全点（Safepoint）</em></strong><ol>
+<li><strong>安全点（Safepoint）</strong><ol>
 <li>在OopMap的协助下，HotSpot可以快速且准确的完成GC Roots枚举，但一个问题随之而来，可能导致引用关系变化，或者说使OopMap内容变化的指令非常多，为每一条指令都生成对应的OopMap需要大量的额外空间，这样GC的成本会更高。</li>
 <li>实际上，HotSpot并没有为每条指令都生成OopMap，而只是在特定位置记录这些信息，这些地方就称为安全点，<strong>即程序执行时并不是在所有地方都能停顿下来进行GC，只有在到达安全点时才能暂停</strong></li>
 <li>另一个需要考虑的问题就是<strong>如何让GC时让所有线程都“跑”到最近的安全点再停顿下来</strong>，JVM有2种解决方法<ol>
@@ -214,7 +214,7 @@
 </li>
 </ol>
 </li>
-<li><strong><em>安全区域（SafeRegion）</em></strong><ol>
+<li><strong>安全区域（SafeRegion）</strong><ol>
 <li>虽然表面上Safepoint能完美解决线程如何进入GC的问题，但实际情况却不一定，如果<strong>当线程处于不执行状态（如sleep或blocked）时，线程不能自己进入安全点</strong>，所以这种情况，就需要安全区域来解决了</li>
 <li>当线程执行到SafeRegion的代码时，会标识自己进入了SafeRegion，这样当GC时，就不用管那些进入SafeRegion状态的线程，<strong>当线程要离开时，会检查系统是否已经完成了根节点枚举（或是整个GC过程），如果完成，则正常离开，否则原地等待</strong></li>
 </ol>
@@ -223,7 +223,7 @@
 </li>
 <li><strong><em>Serial收集器</em></strong><ol>
 <li><strong>最早的收集器，<font color=#00aeef >单线程</font>进行GC</strong></li>
-<li>收集时会暂停所有工作进程（<font color=#00aeef >Stop the Word，简称STW</font>）</li>
+<li>收集时会暂停所有工作进程（<font color=#00aeef >Stop the World，简称STW</font>）</li>
 <li>新生代和老年代都可以使用</li>
 <li>在新生代使用复制算法，在老年代使用标记-整理算法</li>
 <li>因为是单线程GC，没有多线程切换的额外开销，简单实用</li>
@@ -234,7 +234,7 @@
 <li><strong><em>ParNew收集器：</em></strong><ol>
 <li><strong>Serial收集器在新生代的多线程版本</strong></li>
 <li>使用复制算法（因为只针对新生代）</li>
-<li><strong><em>只有在多CPU的环境下，效率才会比Serial高</em></strong></li>
+<li><strong>只有在多CPU的环境下，效率才会比Serial高</strong></li>
 <li>可以通过 <font color=#00aeef >-XX:ParallelGCThreads</font> 来控制GC线程数的多少。需要结合具体CPU个数</li>
 <li>Server模式下新生代的缺省收集器</li>
 </ol>

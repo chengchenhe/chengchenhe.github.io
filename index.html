@@ -82,16 +82,145 @@
                     
                     <div class="row">
     <div class="col">
-        <a href="/2020/05/03/%E5%9B%9E%E9%A1%BE%E4%B8%8E%E6%B7%B1%E5%85%A5--%E5%A4%9A%E7%BA%BF%E7%A8%8B/" class="index-card-link">
+        <a href="/2020/05/23/MySQL--%E7%B4%A2%E5%BC%95/" class="index-card-link">
             <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">回顾与深入--多线程</h4>
+                <h4 class="card-title text-dark article-title">MySQL--索引</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-05-23</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    
+基础知识储备
+
+局部性原理：CPU访问存储器时，无论是存取指令还是存取数据，所访问的存储单元都趋于聚集在一个较小的连续区域中
+时间局部性（Temporal Locality）：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问
+空间局部性（Spatial Locality）：在最近的将来将用到的信息很可能与正在使用的信息在空间地址上是临近的
+
+
+磁盘预读（预读的长度一般为页（pag...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
+        <a href="/2020/05/11/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">多线程--线程池</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-05-11</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    
+线程池是什么： 线程池（Thread Pool）是一种基于池化思想管理线程的工具，经常出现在多线程服务器中，如MySQL。线程过多会带来额外的开销，其中包括创建销毁线程的开销、调度线程的开销等等，同时也降低了计算机的整体性能。线程池维护多个线程，等待监督管理者分配可并发执行的任务。这种做法，一方面避免了处理任务时创建销毁线程开销的代价，另一方面避免了线程数量膨胀导致的过分调度问题，保证了对...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
+        <a href="/2020/05/07/%E5%A4%9A%E7%BA%BF%E7%A8%8B--AQS/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">多线程--AQS</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-05-07</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    一、AQS详解
+什么是AQS
+
+AQS：AbstractQuenedSynchronizer抽象的队列式同步器。是除了java自带的synchronized关键字之外的锁机制。AQS的全称为（AbstractQueuedSynchronizer），这个类在java.util.concurrent.locks包
+AQS的核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
+        <a href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--volatile/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">多线程--volatile</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-05-04</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    
+要想深入了解volatile，首先需要了解缓存一致性协议、指令重排和内存屏障
+
+缓存一致性协议
+由于CPU运行速度很快，内存运行速度很慢，频繁的读取内存中的数据显然效率不高，所以CPU会通过读取缓存行（一行64个字节，因为CPU寄存器就是64个字节）的方式将内存中可能使用的数据读入CPU内部。但在读取缓存过程中别的进程可能会修改数据，这样就会导致数据不一致的问题，所以需要缓存一致性协议。
+...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
+        <a href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">多线程--synchronized</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-05-04</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    
+锁的类型：锁从宏观角度上分为悲观锁和乐观锁
+
+悲观锁：悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会block直到拿到锁。java中的悲观锁就是Synchronized,AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才会转换为悲观锁，如RetreenLock
+乐观锁：乐观锁...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
+        <a href="/2020/05/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E5%9F%BA%E7%A1%80/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">多线程--基础</h4>
                 <h6 class="card-subtitle mt-2 text-muted">
                     By 
                     Anonymous; 
                     Published on 2020-05-03</h6>
                 <p class="card-text text-dark mt-2 article-text">
-                    1、前言&emsp;&emsp;今天是2020年4月28日，从大二接触Java到现在也已经快2年了，从JavaSE到高级框架，看起来好像学了很多，但其实仔细想想，我对大部分知识的认知都只停留在表面，只是知道怎么使用而已，甚至由于长时间没有相应的回顾与总结，某些基础的东西也已经想不起来了，填鸭子式的学习终究太过浮躁，所以，接下来的一段时间我希望自己能脚踏实地，在打好基础上再次深入！
-2、基础回...
+                    
+创建线程的三方式
+
+继承Thread类，重写run()方法
+
+实现Runnable接口，重写run()方法 
+
+使用线程池创建（ThreadPoolExecutor 或 Executors）：本质上依旧是前两种
+
+小案例：龟兔赛跑
+ 
+
+
+
+线程的几种状态
+
+NEW：尚未启动的线程处于此状态（新生）
+RUNNABLE：在Java虚拟机中执行的线程处于这种状态（就绪或者运行）
+TIME_WA...
                 </p>
             </div>
         </a>
@@ -103,14 +232,13 @@
     <div class="col">
         <a href="/2020/04/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-G1%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/" class="index-card-link">
             <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">深入理解JVM-G1垃圾收集器</h4>
+                <h4 class="card-title text-dark article-title">深入理解JVM--G1垃圾收集器</h4>
                 <h6 class="card-subtitle mt-2 text-muted">
                     By 
                     Anonymous; 
                     Published on 2020-04-27</h6>
                 <p class="card-text text-dark mt-2 article-text">
-                    @TOC
-
+                    
 吞吐量：
 吞吐量关注的是，在一定时间内，最大化一个应用的工作量
 用一段时间内同一个事务（或者任务，请求）完成的次数（tps）来衡量系统吞吐量的好坏
@@ -120,7 +248,7 @@
 响应能力：
 响应能力指的是一个程序或系统对一个请求能否及时响应，比如：
 一个桌面UI是否能快速响应一个事件
-一个网站能...
+一个网站能多快返回一...
                 </p>
             </div>
         </a>
@@ -132,7 +260,7 @@
     <div class="col">
         <a href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" class="index-card-link">
             <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">深入理解JVM-垃圾收集器</h4>
+                <h4 class="card-title text-dark article-title">深入理解JVM--垃圾收集器</h4>
                 <h6 class="card-subtitle mt-2 text-muted">
                     By 
                     Anonymous; 
@@ -193,113 +321,6 @@ GC的主要工作区域
 可以看到，之前的桌面虽然说也不乱，但总感觉差了点意思，下面的是改造过后的桌面
 
 第一眼看上去是不是觉得只是什么都没有呢？但其实下面的4个图标每一个都是一个文件夹哦(●ˇ∀ˇ●) ...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/02/15/%E8%A7%A3%E5%8E%8B%E7%89%88mysql%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">解压版mysql安装教程</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-02-15</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    链接： https://www.jb51.net/article/161581.htm
-安装完mysql后，若执行操作报  Expression #1 of ORDER BY clause is not in GROUP BY clause and contains nonaggregated 解决办法：执行：SET sql_mode=’STRICT_TRANS_TABLES,NO_ZERO...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/02/15/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E9%98%85%E8%AF%BB%E6%80%BB%E7%BB%93(16-)/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">大话设计模式读后感(16-)</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-02-15</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    一、状态模式
-定义：&emsp;&emsp;状态模式(State)，当一个对象内在状态改变时允许改变其行为，使这个对象看起来变成了其他类
-优点：&emsp;&emsp;2.1 将所有与某个状态有关的行为放到一个类中，并且可以方便地增加新的状态，只需要改变对象状态即可改变对象的行为。&emsp;&emsp;2.2 允许状态转换逻辑与状态对象合成一体，而不是某一个巨大的条件语句块。&emsp;&...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/02/15/Mybatis--SqlSession%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">Mybatis--SqlSession对象创建过程</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-02-15</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    mybatis是个很方便的框架，其中最重要的无疑就是session对象了。知其然，知其所以然才能不断提高，今天开始尝试阅读源码，掌握更多的知识！当然，本篇皆为个人推测总结，博主才疏学浅，有错误望包涵指出！
-一. 源码阅读
-通过Resource加载全局配置文件，并返回一个流对象
-
-实例化SqlSessionFactoryBuilder对象，通过其build方法，传入全局配置文件的流对象，创建S...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2019/11/11/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E8%A7%A3%E6%9E%90/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">深入理解JVM--字节码文件结构解析</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2019-11-11</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    
-
-在cmd窗口使用javap -verbose 类名称 命令分析一个字节码文件时，将会分析该字节码文件的魔数、版本号、常量池、类信息、类的构造方法、类中的方法信息、类变量与成员变量等信息。
-字节码整体结构
-魔数：所有的.class字节码文件的前4个字节都是魔数，魔数为固定值：0xCAFEBABE，若魔数不对JVM会认为该字节码文件非法而不去加载
-魔数之后的4个字节为版本信息，前两个字节表示...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2019/10/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">深入理解JVM--类加载过程深入解析</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2019-10-29</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    JVM规范允许类加载器在预料某个类将要被使用时就预先加载它，如果在预先加载的过程中遇到了.class文件缺失或存在错误，类加载器必须在程序首次主动使用该类时才报告错误（LinkageError错误）；如果这个类一直没有被程序主动使用，那么类加载器就不会报告错误
-
-Java虚拟机结束生命周期的几种情况
-执行了System.exit();方法
-程序正常执行完毕
-程序在运行过程中遇到了异常导致程序...
                 </p>
             </div>
         </a>

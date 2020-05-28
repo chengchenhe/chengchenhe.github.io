@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>MySQL--索引-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">MySQL--索引</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-05-23</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><ol>
+<li><p><strong>基础知识储备</strong></p>
+<ol>
+<li><strong>局部性原理</strong>：CPU访问存储器时，无论是存取指令还是存取数据，所访问的存储单元都趋于聚集在一个较小的连续区域中<ol>
+<li>时间局部性（Temporal Locality）：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问</li>
+<li>空间局部性（Spatial Locality）：在最近的将来将用到的信息很可能与正在使用的信息在空间地址上是临近的</li>
+</ol>
+</li>
+<li><strong>磁盘预读（预读的长度一般为页（page）的整数倍）</strong><ol>
+<li>页是存储器的逻辑块，操作系统往往将主存和磁盘存储区分割为连续的大小相等的块，每个存储块称为一页（在许多操作系统中，页的大小一般为4K）</li>
+<li>主存和磁盘以页为单位交换数据</li>
+<li>当你创建一个文件时，尽管该文件真实大小不足4K，但占用的空间将会是4K，这是因为以页为单位读取数据效率会更高，磁盘预读也体现了局部性原理</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>索引概述</strong></p>
+<ol>
+<li>在面对庞大的数据量时，使用遍历方法去查找数据是不现实且效率低下的，所以我们需要索引来快速的定位并得到数据，索引是帮助MySQL高效获取数据的数据结构</li>
+<li>索引存储在文件系统（硬盘）中而不是内存中（持久化）</li>
+<li>索引的文件存储形式与存储引擎有关</li>
+</ol>
+</li>
+<li><p><strong>索引文件的结构</strong></p>
+<ol>
+<li><strong>在众多数据结构中，Hash，二叉树，AVL树，红黑树，B树，B+树都可以提高索引的查询速度，为什么选择B+树作为索引文件结构？</strong></li>
+<li><strong>Hash</strong><ol>
+<li>利用Hash存储时需要将数据文件加载到内存中，比较耗费内存空间</li>
+<li>由于Hash内部是通过使用计算出的Hash值决定元素存储的位置，所以内部元素是无序的，因此若是执行等值查询，Hash的确很快，但是大部分时间我们都是使用范围查询，在这种情况下Hash结构就显得不是那么合适了</li>
+</ol>
+</li>
+<li><strong>二叉树</strong><ol>
+<li>在传统二叉树中，左边的节点都会比根节点小，右边的节点都会比根节点大，因此若是一直插入递增的数据，就会变成右边的元素个数远远大于左边的元素个数，这样查找数据时相当于遍历链表结构，效率低下</li>
+</ol>
+</li>
+<li><strong>AVL树（高度平衡树）</strong><ol>
+<li>在传统AVL树中，当任意子树高度差大于1时，AVL树会通过自旋的方式维持平衡，这样虽然解决了二叉树带来的问题，但是由于自旋操作可能是1-n次，所以在更新索引时很可能出现效率低下的问题</li>
+</ol>
+</li>
+<li><strong>红黑树</strong><ol>
+<li>红黑树在高度为n/2时才会进行平衡操作，解决了AVL树的问题，但是在数据量极大的时候依旧会有二叉树的链表查询问题，所以依旧不合适作为索引的数据结构</li>
+</ol>
+</li>
+<li><strong>B树</strong><ol>
+<li><strong>B树的特点</strong><ol>
+<li>所有键值分布在整颗树中</li>
+<li>搜索有可能在非叶子结点结束，在关键字全集内做一次查找,性能逼近二分查找</li>
+<li>每个节点最多拥有m个子树</li>
+<li>根节点至少有2个子树</li>
+<li>分支节点至少拥有m/2颗子树（除根节点和叶子节点外都是分支节点）</li>
+<li>所有叶子节点都在同一层、每个节点最多可以有m-1个key，并且以升序排列</li>
+</ol>
+</li>
+<li><strong>B树的缺点</strong><ol>
+<li>每个节点都有key，同时也包含data，而每个页存储空间是有限的，如果data比较大的话会导致每个节点存储的key数量变小</li>
+<li>当存储的数据量很大的时候会导致深度较大，增大查询时磁盘io次数，进而影响查询性能</li>
+</ol>
+</li>
+<li><strong>B树示意图</strong><br> <img src="https://img-blog.csdnimg.cn/20200523152625417.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li><strong>示例图分析</strong><ol>
+<li>每个节点占用一个磁盘块，一个节点上有两个升序排序的关键字和三个指向子树根节点的指针，指针存储的是子节点所在磁盘块的地址。两个关键词划分成的三个范围域对应三个指针指向的子树的数据的范围域。以根节点为例，关键字为 16 和 34，P1 指针指向的子树的数据范围为小于 16，P2 指针指向的子树的数据范围为 16~34，P3 指针指向的子树的数据范围为大于 34。 </li>
+<li>查找关键字过程：<ol>
+<li>根据根节点找到磁盘块 1，读入内存。【磁盘 I/O 操作第 1 次】</li>
+<li>比较关键字 28 在区间（16,34），找到磁盘块 1 的指针 P2。</li>
+<li>根据 P2 指针找到磁盘块 3，读入内存。【磁盘 I/O 操作第 2 次】</li>
+<li>比较关键字 28 在区间（25,31），找到磁盘块 3 的指针 P2。</li>
+<li>根据 P2 指针找到磁盘块 8，读入内存。【磁盘 I/O 操作第 3 次】</li>
+<li>在磁盘块 8 中的关键字列表中找到关键字 28</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>B+树（MySQL索引数据结构）</strong><ol>
+<li>B+Tree是在BTree的基础之上做的一种优化</li>
+<li>B+Tree每个节点可以包含更多的节点，这个做的原因有两个，第一个原因是为了降低树的高度，    第二个原因是将数据范围变为多个区间，区间越多，数据检索越快</li>
+<li>非叶子节点存储key，叶子节点存储key和数据</li>
+<li>叶子节点两两指针相互连接（符合磁盘的预读特性），顺序查询性能更高</li>
+<li>在B+Tree上有两个头指针，一个指向根节点，另一个指向关键字最小的叶子节点，而且所有叶子节点（即数据节点）之间是一种链式环结构。因此可以对 B+Tree 进行两种查找运算：一种是对于主键的范围查找和分页查找，另一种是从根节点开始，进行随机查找。</li>
+<li>B+树结构<br> <img src="https://img-blog.csdnimg.cn/20200523154230914.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>索引的分类</strong></p>
+<ol>
+<li>主键索引：主键是一种唯一性索引，但它必须指定为PRIMARY KEY，每个表只能有一个主键，MySQL会自动为主键设立索引</li>
+<li>唯一索引：索引列的所有值都只能出现一次，即必须唯一，值可以为空</li>
+<li>普通索引：基本的索引类型，值可以为空，没有唯一性的限制。（覆盖索引）</li>
+<li>全文索引,MyISAM支持，Innodb在5.6之后支持：全文索引的索引类型为FULLTEXT。全文索引可以在varchar、char、text类型的列上创建</li>
+<li>组合索引：多列值组成一个索引，专门用于组合搜索（最左匹配原则）</li>
+</ol>
+</li>
+<li><p><strong>MySQL存储引擎</strong></p>
+<ol>
+<li><strong>InnoDB</strong><ol>
+<li>MySQL 5.5.5 之后，InnoDB 作为默认存储引擎</li>
+<li>InnoDB将索引与数据都放入一个ibd文件中</li>
+<li>InnoDB通过B+Tree结构对主键创建索引，然后叶子节点中存储记录，如果没有主键，那么会选择唯一键，如果没有唯一键，那么会生成一个6位的row_id来作为主键</li>
+<li>叶子节点直接存放数据<br> <img src="https://img-blog.csdnimg.cn/20200523162549114.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li><strong>MyISAM</strong><ol>
+<li>MyISAM将索引与数据放入不同的两个文件中，索引文件后缀为MYI，数据文件后缀为MYD</li>
+<li>MyISAM也使用B+树进行数据存储，但是与InnoDB不同的是，MyISAM叶子节点存放的不是数据，而是数据地址<br><img src="https://img-blog.csdnimg.cn/20200523162621584.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li>InnoDB与MyISAM的异同<br> <img src="https://img-blog.csdnimg.cn/20200523162716903.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li><p><strong>索引维护</strong></p>
+<ol>
+<li>索引在插入新的值的时候，为了维护索引的有序性，必须要维护，在维护索引的时候需要需要分以下集中情况：<ol>
+<li>如果插入一个比较大的值，直接插入即可，几乎没有成本</li>
+<li>如果插入的是中间的某一个值，需要逻辑上移动后续的元素，空出位置</li>
+<li>如果需要插入的数据页满了，就需要单独申请一个新的数据页，然后移<br>动部分数据过去，叫做页分裂，此时性能会受影响同时空间的使用率也会降<br>低，除了页分裂之外还包含页合并</li>
+</ol>
+</li>
+<li><strong>因此，尽量使用自增主键作为索引</strong></li>
+</ol>
+</li>
+<li><p><strong>索引面试难点</strong></p>
+<ol>
+<li><strong>回表</strong>：<ol>
+<li>如果创建索引的键是其他字段，那么在叶子节点中存储的是该记录的主键，然后再通过主键索引找到对应的记录,叫做回表</li>
+<li>拿emp表举例，你为ename建立了索引，然后执行(select * from emp where ename=’smith’;)这时MySQL会先通过ename索引表得到对应的主键（empno），再通过该主键去主键索引表中寻找数据</li>
+</ol>
+</li>
+<li><strong>索引覆盖</strong><ol>
+<li>依旧是上面的例子，我们已经知道了执行select * 需要遍历2棵索引B+树，但是如果将sql语句改为(select empno from emp where ename=’smith’)，则在遍历ename索引表时就能将期望的empno获取到并返回，并不需要再次遍历主键表，这就是索引覆盖</li>
+</ol>
+</li>
+<li><strong>最左前缀</strong><ol>
+<li>顾名思义，就是最左优先，假设我们创建了empno_ename_sal多列索引,相当于创建了(empno)单列索引，(empno,ename)组合索引以及(empno,ename,sal)组合索引。</li>
+<li>在创建多列索引时，要根据业务需求，where子句中使用最频繁的一列放在最左边</li>
+</ol>
+</li>
+<li><strong>索引下推</strong><ol>
+<li>对于user_table表，我们现在有（ename,deptno）联合索引<br>如果现在有一个需求，查出名称中以“S”开头且部门编号为10的用户信息，语句C如下：”select * from emp where ename like ‘S%’ and deptno=10”.语句C有两种执行可能<ol>
+<li>根据（ename,deptno）联合索引查询所有满足名称以“S”开头的索引，然后回表查询出相应的全行数据，然后再筛选出满足年龄小于等于10的用户数据</li>
+<li>根据（ename,deptno）联合索引查询所有满足名称以“S”开头的索引，然后直接再筛选出部门编号为10的索引，之后再回表查询全行数据</li>
+<li>明显的，第二种方式需要回表查询的全行数据比较少，这就是mysql的索引下推</li>
+</ol>
+</li>
+<li>innodb引擎的表，索引下推只能用于二级索引</li>
+<li>索引下推一般可用于所求查询字段（select列）不是/不全是联合索引的字段，查询条件为多条件查询且查询条件子句（where/order by）字段全是联合索引</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/05/11/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E7%BA%BF%E7%A8%8B%E6%B1%A0/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">多线程--线程池
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/05/11/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E7%BA%BF%E7%A8%8B%E6%B1%A0/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">多线程--线程池
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

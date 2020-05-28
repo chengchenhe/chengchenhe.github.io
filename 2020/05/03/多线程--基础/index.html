@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>深入理解JVM--JVM结构-何承宸的个人网站</title>
+    <title>多线程--基础-何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -78,9 +78,9 @@
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
         
-        <h1 class="mt-4 article-title page-title">深入理解JVM--JVM结构</h1>
+        <h1 class="mt-4 article-title page-title">多线程--基础</h1>
         
-        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-04-20</p>
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-05-03</p>
         
         <div class="tags">
             <ul class="tag-list">
@@ -96,45 +96,70 @@
                 <div class="row">
                     <div class="col-12">
                         <main>
-                            <article class="article-text page-content"><p>JVM模型：</p>
-<p><img src="https://img-blog.csdnimg.cn/20200419174918505.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+                            <article class="article-text page-content"><ol>
+<li><p><strong><em>创建线程的三方式</em></strong></p>
 <ol>
-<li><strong>虚拟机栈（JVM Stack）</strong>：一个线程对应一个JVM Stack，一个JVM Stack中包含一组<font color=#00aeef >栈帧</font>（Stack Frame），<strong><em>栈帧是一组数据结构，封装了方法的局部变量表，动态链接信息，方法的返回地址以及操作数栈等信息。</em></strong> 栈帧的结构图：<br><img src="https://img-blog.csdnimg.cn/20200419165310442.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
-<li><strong>局部变量表(LocalVariableTable)：</strong> <ol>
-<li>每一个方法都有对应的局部变量表，用于存储方法中的局部变量，<strong>局部变量的个数≥1，所有方法都会默认传入this变量</strong></li>
-<li>局部变量的容量以 <font color=#00aeef >变量槽（Variable Slot）</font> 为最小单位，<strong>每个slot占据32个字节，执行实例方法时，索引为0的slot默认存储this变量，其它变量从1索引处开始存储</strong></li>
-<li>基本数据类型在局部变量表中占据1个 slot，但是大数据类型，<strong>long和double占据2个slot</strong></li>
+<li><p>继承Thread类，重写run()方法<br><img src="https://img-blog.csdnimg.cn/20200428110221315.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>实现Runnable接口，重写run()方法<br> <img src="https://img-blog.csdnimg.cn/2020042811032482.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>使用线程池创建（ThreadPoolExecutor 或 Executors）：本质上依旧是前两种</p>
+</li>
+<li><p>小案例：龟兔赛跑</p>
+<p> <img src="https://img-blog.csdnimg.cn/20200428112033633.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
 </ol>
 </li>
-<li><strong>动态连接：</strong> 可以看作不可使用的指针，指向位于常量池中的实例对象，引用访问对象的方式有2种，JVM一般使用第二种<ol>
-<li>句柄方式：引用指向堆中的一个句柄，该句柄一部分存储<strong>堆中目标实例对象的真实地址</strong>，另一部分存储<strong>方法区中实例对象的class对象的真实地址</strong></li>
-<li>直接指针方式：该引用指向堆中的一个对象，该对象一部分存储<strong>目标实例对象</strong>，另一部分依旧存储<strong>方法区中实例对象的class对象的真实地址</strong></li>
-<li>与动态连接相对应的是<font color=#00aeef >静态解析</font>，即在类的加载阶段即将类中静态变量的符号引用转换为直接引用。<strong><em>值得注意的是：类中的静态变量会在类的加载阶段和类的真实class对象一起存储在方法区中。</em></strong></li>
+<li><p><strong><em>线程的几种状态</em></strong></p>
+<ol>
+<li><strong>NEW</strong>：尚未启动的线程处于此状态（新生）</li>
+<li><strong>RUNNABLE</strong>：在Java虚拟机中执行的线程处于这种状态（就绪或者运行）</li>
+<li><strong>TIME_WAITING</strong>：在<font color=#00aeef >指定的等待时间内</font>等待另一个线程执行操作的线程处于此状态（阻塞）</li>
+<li><strong>WAITING</strong>：<font color=#00aeef >无限期等待</font>另一线程执行特定操作的线程处于此状态（等待）</li>
+<li><strong>BLOCKED</strong>：等待监视器锁定被阻止的线程处于此状态（锁）</li>
+<li><strong>TERMINATED</strong>：线程已完成执行</li>
 </ol>
 </li>
-<li><strong>操作数栈：</strong> 与我们认知中的栈结构相似，先进后出的数据结构，里面主要通过相关代码（助记符）来操作方法中的局部变量与局部变量表（bytecode/MyTest08）</li>
-<li><strong>返回地址：</strong> 方法开始执行后，只有 2 种方式可以退出 ：方法返回指令，异常退出。</li>
-<li><strong>栈数据区：</strong> 帧数据区的大小依赖于 JVM 的具体实现。</li>
-<li><strong>可以在运行设置中用-Xss指令来指定栈所占用的最大内存，如：-Xss160k</strong></li>
+<li><p><strong><em>改变线程状态的几种方法</em></strong></p>
+<ol>
+<li><strong>start()：</strong><ol>
+<li>使此线程开始执行；Java虚拟机调用此线程的run方法</li>
+<li>结果是两个线程同时运行：当前线程（从对start方法的调用返回）和另一个线程（执行其run方法）</li>
+<li>多次启动一个线程是不合法的。特别是，一个线程一旦完成执行就不能重新启动</li>
 </ol>
 </li>
-<li><strong>本地方法栈：</strong> 主要用于处理<font color=#00aeef >本地方法</font>（即不是由JAVA语言编写，而是由C或C++编写的方法），运行方式与虚拟机栈相似，<strong>在一些JVM中，会把本地方法栈和虚拟机栈合为一起。</strong></li>
-<li><strong>程序计数器：</strong> 记录着当前线程所执行的字节码的行号指示器</li>
-<li><strong>堆（Heap）：</strong> <ol>
-<li><strong>JVM 管理的最大的一块内存空间，主要用于存放Java类的实例对象</strong>，其被划分为两个不同的区域：新生代 ( Young )和老年代 ( Old )，其中新生代 ( Young )又被划分为：Eden、From Survivor和To Survivor三个区域</li>
-<li>堆中存储实例对象有2种方式，一般是第二种<ol>
-<li><strong>指针碰撞</strong>（前提是堆中的空间是连续的且通过一个指针分割，一边是已被占用的内存，另一边是未被占用的内存）</li>
-<li><strong>空闲列表</strong>（前提是堆中的内存是不连续的且已被使用的空间和未被使用的空间交织在一起，这时，虚拟机需要通过一个列表来记录</li>
+<li><strong>sleep(long millis)：</strong> 使当前执行的线程休眠，休眠时间为知道的millis数（单位为毫秒）</li>
+<li><strong>yield()：</strong> 让线程直接进入就绪状态，重新等待cpu调用，不占资源，礼让并不是一定成功的，有可能线程刚进入就绪状态就被cpu重新调度</li>
+<li><strong>join()</strong>：join让启动的线程进入阻塞状态让别的线程先走，可以设置时间，如果时间过了别的线程还没走完则开始继续线程（相当于插队）</li>
+<li><strong>wait()</strong>：当前线程必须拥有此对象的监视器。线程释放此监视器的所有权，并等待直到另一个线程通过调用notify方法或notifyAll方法通知等待此对象监视器唤醒的线程。（让线程进入等待状态，等待其它线程唤醒；<strong>对一个对象使用wait()，不是让该对象wait，而是让持有该对象锁的线程wait()!</strong>）</li>
+<li><strong>notify()：</strong> 唤醒等待此对象监视器的单个线程。如果有线程正在等待这个对象，则选择其中一个线程被唤醒。选择是任意的，是根据实现的自由裁量权来进行的。线程通过调用其中一个等待方法来等待对象的监视器（唤醒其它的等待线程）</li>
+<li><strong><em>setDaemon(true)：</em></strong> 将当前线程变为守护线程（所有线程默认为用户线程，即JVM会等线程执行完后才停止运行，而守护线程则不受此保护，JVM不会等待守护线程执行完毕）</li>
+<li>线程状态转换图：<br> <img src="https://img-blog.csdnimg.cn/20200504112624934.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 </ol>
 </li>
-<li><strong><em>new关键字创建对象的3个步骤</em></strong><pre><code>1. 在堆内存中创建对象实例（new）
-2. 为对象中的实例变量赋值（invokespecial）
-3. 将对象的引用返回（dup）</code></pre></li>
-<li>可用 <font color=#00aeef >-Xms1m -Xmx1m -XX:+HeapDumpOnOutOfMemoryError</font>指定堆的最小内存和最大内存，如上面的指令代表最小内存与最大内存均为1m</li>
+<li><p><strong><em>线程同步</em></strong><br> 由于我们可以通过private关键字来保证数据对象只能被方法访问，所以我们只需要针对方法提出一套机制，这套机制就是synchronized关键字，它包括两种用法：<strong>synchronized方法和synchronized块</strong></p>
+<ol>
+<li>同步方法（public synchronized void method(int args){}）<br> synchronized方法控制对“成员变量|类变量”对象的访问：每个对象对应一把锁，每个调用synchronized方法的线程都必须获得该方法所属对象的锁方能执行，否则所属线程阻塞，方法一旦执行，则独占该所，知道从方法返回时才将锁释放，此后被阻塞的线程方能获得该锁，重新进入可执行状态。 </li>
+<li>同步块（synchronized （obj）{}，obj称为同步监视器）<ol>
+<li>obj可以是任何对象，但是推荐使用共享资源作为同步监视器</li>
+<li>同步方法中无需指定同步监视器，因为同步方法的同步监视器是this即该对象本身，或class对象（<strong>没有static就是锁当前实例化对象，加了static锁的是位于元空间的类的class对象</strong>）</li>
+<li>同步监视器的执行过程<ol>
+<li>第一个线程访问，锁定同步监视器，执行其中代码</li>
+<li>第二个线程访问，发现同步监视器被锁定，无法访问</li>
+<li>第一个线程访问完毕，解锁同步监视器</li>
+<li>第二个线程访问，发现同步监视器为锁，锁定并访问</li>
 </ol>
 </li>
-<li><strong>方法区（元空间）：</strong> JDK1.7前被称为==永久代（Permanent Generation）==，从JDK 1.8开始，已经废弃永久代。使用<font color=#00aeef >元空间（meta space）</font>，用于<strong>存储静态变量、元数据（class对象）与常量池</strong>，元空间深度解析：<a href="https://www.infoq.cn/article/Java-permgen-Removed" target="_blank" rel="noopener">https://www.infoq.cn/article/Java-permgen-Removed</a></li>
-<li>JVM监视调优相关工具<br> <img src="https://img-blog.csdnimg.cn/20200420171152767.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong><em>死锁问题</em></strong></p>
+<ol>
+<li>死锁：指多个线程因竞争资源而造成的一种僵局（互相等待），若无外力作用，这些进程都将无法向前推进</li>
+<li>死锁案例：<br> <img src="https://img-blog.csdnimg.cn/20200429143113916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
 </ol>
 </article>
                         </main>
@@ -150,19 +175,19 @@
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            深入理解JVM--垃圾收集器</span>
+                            多线程--synchronized</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/16/CC%E3%81%AE%E6%A1%8C%E9%9D%A2%E6%94%B9%E9%80%A0/"
+                        href="/2020/04/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-G1%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">CCの桌面改造
+                            aria-hidden="true">深入理解JVM--G1垃圾收集器
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -171,19 +196,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            深入理解JVM--垃圾收集器</span>
+                            多线程--synchronized</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/16/CC%E3%81%AE%E6%A1%8C%E9%9D%A2%E6%94%B9%E9%80%A0/"
+                        href="/2020/04/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-G1%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">CCの桌面改造
+                            aria-hidden="true">深入理解JVM--G1垃圾收集器
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

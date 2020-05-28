@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>深入理解JVM--JVM结构-何承宸的个人网站</title>
+    <title>多线程--volatile-何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -78,9 +78,9 @@
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
         
-        <h1 class="mt-4 article-title page-title">深入理解JVM--JVM结构</h1>
+        <h1 class="mt-4 article-title page-title">多线程--volatile</h1>
         
-        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-04-20</p>
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-05-04</p>
         
         <div class="tags">
             <ul class="tag-list">
@@ -96,45 +96,56 @@
                 <div class="row">
                     <div class="col-12">
                         <main>
-                            <article class="article-text page-content"><p>JVM模型：</p>
-<p><img src="https://img-blog.csdnimg.cn/20200419174918505.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+                            <article class="article-text page-content"><ol>
+<li><p><strong>要想深入了解volatile，首先需要了解缓存一致性协议、指令重排和内存屏障</strong></p>
 <ol>
-<li><strong>虚拟机栈（JVM Stack）</strong>：一个线程对应一个JVM Stack，一个JVM Stack中包含一组<font color=#00aeef >栈帧</font>（Stack Frame），<strong><em>栈帧是一组数据结构，封装了方法的局部变量表，动态链接信息，方法的返回地址以及操作数栈等信息。</em></strong> 栈帧的结构图：<br><img src="https://img-blog.csdnimg.cn/20200419165310442.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
-<li><strong>局部变量表(LocalVariableTable)：</strong> <ol>
-<li>每一个方法都有对应的局部变量表，用于存储方法中的局部变量，<strong>局部变量的个数≥1，所有方法都会默认传入this变量</strong></li>
-<li>局部变量的容量以 <font color=#00aeef >变量槽（Variable Slot）</font> 为最小单位，<strong>每个slot占据32个字节，执行实例方法时，索引为0的slot默认存储this变量，其它变量从1索引处开始存储</strong></li>
-<li>基本数据类型在局部变量表中占据1个 slot，但是大数据类型，<strong>long和double占据2个slot</strong></li>
+<li><strong>缓存一致性协议</strong><ol>
+<li>由于CPU运行速度很快，内存运行速度很慢，频繁的读取内存中的数据显然效率不高，所以CPU会通过读取缓存行（一行64个字节，因为CPU寄存器就是64个字节）的方式将内存中可能使用的数据读入CPU内部。但在读取缓存过程中别的进程可能会修改数据，这样就会导致数据不一致的问题，所以需要缓存一致性协议。</li>
+<li>缓存一致性有很多种实现方式，目前windows上最主流的实现方式是MESI</li>
+<li>使用MESI，缓存行就会有4种不同的状态<ol>
+<li>Modified（M）：这行数据有效，数据被修改了，和内存中的数据不一致，数据只存在于本Cache中</li>
+<li>Exclusive（E）:这行数据有效，数据和内存中的数据一致，数据只存在于本Cache中</li>
+<li>Share（S）：这行数据有效，数据和内存中的数据一致，数据存在于很多Cache中</li>
+<li>Invalid（I）：这行数据无效</li>
+<li>MESI主要原理就是缓存行在不同的状态间切换，实现缓存一致（比如线程A将数据改了，那么此时A中的缓存行会从S状态变为M状态，线程B中拥有被修改数据的缓存行会变成I状态，当A将数据更新到内存且B重新读取并更新了数据后，A和B状态都会变为S）</li>
 </ol>
 </li>
-<li><strong>动态连接：</strong> 可以看作不可使用的指针，指向位于常量池中的实例对象，引用访问对象的方式有2种，JVM一般使用第二种<ol>
-<li>句柄方式：引用指向堆中的一个句柄，该句柄一部分存储<strong>堆中目标实例对象的真实地址</strong>，另一部分存储<strong>方法区中实例对象的class对象的真实地址</strong></li>
-<li>直接指针方式：该引用指向堆中的一个对象，该对象一部分存储<strong>目标实例对象</strong>，另一部分依旧存储<strong>方法区中实例对象的class对象的真实地址</strong></li>
-<li>与动态连接相对应的是<font color=#00aeef >静态解析</font>，即在类的加载阶段即将类中静态变量的符号引用转换为直接引用。<strong><em>值得注意的是：类中的静态变量会在类的加载阶段和类的真实class对象一起存储在方法区中。</em></strong></li>
 </ol>
 </li>
-<li><strong>操作数栈：</strong> 与我们认知中的栈结构相似，先进后出的数据结构，里面主要通过相关代码（助记符）来操作方法中的局部变量与局部变量表（bytecode/MyTest08）</li>
-<li><strong>返回地址：</strong> 方法开始执行后，只有 2 种方式可以退出 ：方法返回指令，异常退出。</li>
-<li><strong>栈数据区：</strong> 帧数据区的大小依赖于 JVM 的具体实现。</li>
-<li><strong>可以在运行设置中用-Xss指令来指定栈所占用的最大内存，如：-Xss160k</strong></li>
+<li><strong>指令重排</strong>：由于CPU读取内存效率较低，所以CPU在保证结果不变的情况下有可能会先执行后面的指令。指令重排图示：<br> <img src="https://img-blog.csdnimg.cn/20200501170431999.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li><strong>内存屏障：主要是为了防止发生指令重排，在JVM层面和CPU层面有不同的实现</strong><ol>
+<li>JVM层面：顾名思义，将上下两条指令通过一道屏障想隔开，相互间不能打乱顺序执行<ol>
+<li>LoadLoad屏障：在Load2及后续读取操作要读取的数据被访问前，保证Load2要读取的数据被读取完毕（Load1；LoadLoad；Load2）</li>
+<li>StoreStore屏障：在Store2及后续写入操作执行前，保证Store1的写入操作对其他处理器可见（Store1；StoreStore；Store2）</li>
+<li>LoadStore屏障：在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕（Load1；LoadStore；Store2）</li>
+<li>StoreLoad屏障：在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见（Store1；StoreLoad；Load2）</li>
 </ol>
 </li>
-<li><strong>本地方法栈：</strong> 主要用于处理<font color=#00aeef >本地方法</font>（即不是由JAVA语言编写，而是由C或C++编写的方法），运行方式与虚拟机栈相似，<strong>在一些JVM中，会把本地方法栈和虚拟机栈合为一起。</strong></li>
-<li><strong>程序计数器：</strong> 记录着当前线程所执行的字节码的行号指示器</li>
-<li><strong>堆（Heap）：</strong> <ol>
-<li><strong>JVM 管理的最大的一块内存空间，主要用于存放Java类的实例对象</strong>，其被划分为两个不同的区域：新生代 ( Young )和老年代 ( Old )，其中新生代 ( Young )又被划分为：Eden、From Survivor和To Survivor三个区域</li>
-<li>堆中存储实例对象有2种方式，一般是第二种<ol>
-<li><strong>指针碰撞</strong>（前提是堆中的空间是连续的且通过一个指针分割，一边是已被占用的内存，另一边是未被占用的内存）</li>
-<li><strong>空闲列表</strong>（前提是堆中的内存是不连续的且已被使用的空间和未被使用的空间交织在一起，这时，虚拟机需要通过一个列表来记录</li>
+<li>CPU层面：CPU层面 上虽然有3条原语支持内存屏障（sfence，ifence，mfence），但是由于并不是所有CPU都支持这3条原语，所以HotSpot虚拟机实现内存屏障的方式为通过lock指令去锁总线，当有CPU在修改数据时禁止其它CPU访问，借此来实现内存屏障</li>
 </ol>
 </li>
-<li><strong><em>new关键字创建对象的3个步骤</em></strong><pre><code>1. 在堆内存中创建对象实例（new）
-2. 为对象中的实例变量赋值（invokespecial）
-3. 将对象的引用返回（dup）</code></pre></li>
-<li>可用 <font color=#00aeef >-Xms1m -Xmx1m -XX:+HeapDumpOnOutOfMemoryError</font>指定堆的最小内存和最大内存，如上面的指令代表最小内存与最大内存均为1m</li>
 </ol>
 </li>
-<li><strong>方法区（元空间）：</strong> JDK1.7前被称为==永久代（Permanent Generation）==，从JDK 1.8开始，已经废弃永久代。使用<font color=#00aeef >元空间（meta space）</font>，用于<strong>存储静态变量、元数据（class对象）与常量池</strong>，元空间深度解析：<a href="https://www.infoq.cn/article/Java-permgen-Removed" target="_blank" rel="noopener">https://www.infoq.cn/article/Java-permgen-Removed</a></li>
-<li>JVM监视调优相关工具<br> <img src="https://img-blog.csdnimg.cn/20200420171152767.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li><p><strong>volatile的作用</strong></p>
+<ol>
+<li><p>线程间相互可见。对一个volatile变量的读，总是能看到（任意线程）对这个volatile变量最后的写入，小示例<br> <img src="https://img-blog.csdnimg.cn/20200501175306729.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>虽然volatile能使线程间可见，但其并不是线程安全的，因为它虽然能将修改后的值很快的写内存中，但是并不能阻止其它线程去取值，比如线程A将0改为了1，其它线程看见了，但是同时拿的1，这样就是线程不安全的了！，案例<br><img src="https://img-blog.csdnimg.cn/20200504143454360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</li>
+<li><p>防止出现指令重排（比如使用DCL单例的时候，如果不加volatile可能在高并发环境下出现指令重排，返回一个半初始化对象）</p>
+</li>
+</ol>
+</li>
+<li><p><strong>volatile实现原理：</strong></p>
+<ol>
+<li>通过插入内存屏障指令禁止编译器和CPU对程序进行重排序</li>
+<li>当对声明了volatile的变量进行写操作时，JVM就会向处理器发送一条Lock前缀的指令，这条Lock前缀指令产生如下两个作用：<ol>
+<li>Lock前缀指令会引起处理器缓存回写到系统内存，并使用缓存一致性机制来确保回写的原子性</li>
+<li>一个处理器的缓存回写到系统内存会导致其他处理器的缓存无效。处理器使用MESI控制协议去维护内部缓存和其他处理器缓存的一致性。处理器能嗅探其他处理器访问系统内存和它们的内部缓存。处理器使用嗅探技术保证它的内部缓存、系统内存和其他处理器的缓存的数据在总线上保持一致。例如，在Pentium和P6 family处理器中，如果通过嗅探一个处理器来检测其他处理器打算写内存地址，而这个地址当前处于共享状态，那么正在嗅探的处理器将使它的缓存行无效，在下次访问相同内存地址时，强制执行缓存行填充</li>
+</ol>
+</li>
+</ol>
+</li>
 </ol>
 </article>
                         </main>
@@ -150,19 +161,19 @@
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        href="/2020/05/07/%E5%A4%9A%E7%BA%BF%E7%A8%8B--AQS/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            深入理解JVM--垃圾收集器</span>
+                            多线程--AQS</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/16/CC%E3%81%AE%E6%A1%8C%E9%9D%A2%E6%94%B9%E9%80%A0/"
+                        href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">CCの桌面改造
+                            aria-hidden="true">多线程--synchronized
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -171,19 +182,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/24/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"
+                        href="/2020/05/07/%E5%A4%9A%E7%BA%BF%E7%A8%8B--AQS/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            深入理解JVM--垃圾收集器</span>
+                            多线程--AQS</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/04/16/CC%E3%81%AE%E6%A1%8C%E9%9D%A2%E6%94%B9%E9%80%A0/"
+                        href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">CCの桌面改造
+                            aria-hidden="true">多线程--synchronized
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

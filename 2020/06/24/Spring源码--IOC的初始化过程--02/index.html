@@ -104,17 +104,16 @@
 <h3 id="二、源码阅读"><a href="#二、源码阅读" class="headerlink" title="二、源码阅读"></a>二、源码阅读</h3><ol>
 <li>接着01博客，到refresh()方法执行了<br> <img src="https://img-blog.csdnimg.cn/20200623215600609.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>进入了==AbstractApplicationContext==中的refresh()方法，首先调用的方法是prepareRefresh()<br> <img src="https://img-blog.csdnimg.cn/20200623215706437.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
-<li><strong>prepareRefresh</strong><pre><code>1. 设置了一些基本属性值，跳过到initPropertySources()方法
-    ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623215859346.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)
-2. 进入该方法，发现里面什么也没做，由注释我们可以得知该方法是留给子类作扩展的
-    ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623220039755.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)
-3. 回到prepareRefresh，调用getEnvironment().validateRequiredProperties();方法，同样由注释我们可以得知该方法用来验证已经读入的属性是否可以被解析，getEnvironment方法获得的对象实际上是我们在setConfigLocations步骤中在AbstractApplicationContext中创建的environment对象
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2020062322042611.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)
-4. 后面都没什么可注意的，回到refresh中，调用ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();去获得==ConfigurableListableBeanFactory==工厂实例，ConfigurableListableBeanFactory是一个接口
-    ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623220922725.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li><strong>prepareRefresh</strong><ol>
+<li>设置了一些基本属性值，跳过到initPropertySources()方法<br> <img src="https://img-blog.csdnimg.cn/20200623215859346.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入该方法，发现里面什么也没做，由注释我们可以得知该方法是留给子类作扩展的<br> <img src="https://img-blog.csdnimg.cn/20200623220039755.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>回到prepareRefresh，调用getEnvironment().validateRequiredProperties();方法，同样由注释我们可以得知该方法用来验证已经读入的属性是否可以被解析，getEnvironment方法获得的对象实际上是我们在setConfigLocations步骤中在AbstractApplicationContext中创建的environment对象<br> <img src="https://img-blog.csdnimg.cn/2020062322042611.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>后面都没什么可注意的，回到refresh中，调用ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();去获得==ConfigurableListableBeanFactory==工厂实例，ConfigurableListableBeanFactory是一个接口<br> <img src="https://img-blog.csdnimg.cn/20200623220922725.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
 <li><strong>obtainFreshBeanFactory()</strong><ol>
-<li>进入该方法，里面执行了2个语句，先进入refreshBeanFactory();<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623220651781.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>该方法的执行在==AbstractRefreshableApplicationContext==中，首先判断了下当前是否存在工厂对象，如果存在则销毁，下一步<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623220809463.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>进入该方法，里面执行了2个语句，先进入refreshBeanFactory();<br> <img src="https://img-blog.csdnimg.cn/20200623220651781.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>该方法的执行在==AbstractRefreshableApplicationContext==中，首先判断了下当前是否存在工厂对象，如果存在则销毁，下一步<br> <img src="https://img-blog.csdnimg.cn/20200623220809463.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>执行createBeanFactory()创建==DefaultListableBeanFactory==工厂实例，DefaultListableBeanFactory实现了ConfigurableListableBeanFactory接口，进入createBeanFactory方法<br> <img src="https://img-blog.csdnimg.cn/2020062322152715.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>里面调用了DefaultListableBeanFactory的构造方法，传入通过getInternalParentBeanFactory()获得的参数，由该方法名我们可知是得到父工厂对象，但显然我们从来没有指定或创建过父工厂对象，所以传入的实际参数为null，下一步<br> <img src="https://img-blog.csdnimg.cn/20200623221940349.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>调用父类的构造方法<br> <img src="https://img-blog.csdnimg.cn/20200623222207507.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
@@ -125,9 +124,9 @@
 <li>customizeBeanFactory(beanFactory)，进入该方法，由注释我们可以知道该方法是用来给用户扩展的，可以通过该方法对创建好的工厂对象做一些修改<br><img src="https://img-blog.csdnimg.cn/20200623223507357.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li><strong>工厂创建好了，接下来就是解析配置文件了，进入loadBeanDefinitions(beanFactory);</strong><br>   <img src="https://img-blog.csdnimg.cn/20200624154350768.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
 <li>进入到了==AbstractXmlApplicationContext==类中执行方法，首先创建xml解析器实例，并对其中的一些基本属性赋值（Environment，ResourceLoader，EntityResolver），往下走到达initBeanDefinitionReader，进入该方法<br> <img src="https://img-blog.csdnimg.cn/20200624161729824.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-<li>由上面的注释我们知道这个方法又是留给子类作扩展使用的，用来自定义解析器。<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200624161911971.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>由上面的注释我们知道这个方法又是留给子类作扩展使用的，用来自定义解析器。<br> <img src="https://img-blog.csdnimg.cn/20200624161911971.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>回到loadBeanDefinitions，发现最后一步调用的是loadBeanDefinitions的重载方法，传入的是我们刚创建好的xml解析器<br> <img src="https://img-blog.csdnimg.cn/20200624162131864.png" alt="在这里插入图片描述"></li>
-<li>进入该方法后首先是获得一个Resource[]数组对象，由名称configResources我们可以推断这里面包含的就是配置文件相关的Resource信息，进入该方法<br><img src="https://img-blog.csdnimg.cn/20200624162401528.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入该方法后首先是获得一个Resource[]数组对象，由名称configResources我们可以推断这里面包含的就是配置文件相关的Resource信息，进入该方法<br> <img src="https://img-blog.csdnimg.cn/20200624162401528.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>此时回到了==ClassPathXmlApplicationContext==类中，需要返回类中的configResources对象，但此时该对象显然为空，我们之前通过setConfigLocations(configLocations);语句设置的是==AbstractRefreshableApplicationContext==类中的configLocations属性，不要搞混了<br> <img src="https://img-blog.csdnimg.cn/20200624162756163.png" alt="在这里插入图片描述"></li>
 <li>因为此时configResources为null，所以进入下面的String[] configLocations = getConfigLocations();获得configLocations属性，这个属性显然我们之前设置过，进入该方法<br> <img src="https://img-blog.csdnimg.cn/20200624162943301.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>进入到了==AbstractRefreshableApplicationContext==类中，将configLocations属性返回<br> <img src="https://img-blog.csdnimg.cn/20200624163031516.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
@@ -167,19 +166,19 @@
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Spring源码--IOC的初始化过程--01</span>
+                            Spring源码--IOC的初始化过程--03</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/03/MySQL--%E7%BB%83%E4%B9%A0%E9%A2%98/"
+                        href="/2020/06/23/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">MySQL--练习题
+                            aria-hidden="true">Spring源码--IOC的初始化过程--01
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -188,19 +187,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Spring源码--IOC的初始化过程--01</span>
+                            Spring源码--IOC的初始化过程--03</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/03/MySQL--%E7%BB%83%E4%B9%A0%E9%A2%98/"
+                        href="/2020/06/23/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">MySQL--练习题
+                            aria-hidden="true">Spring源码--IOC的初始化过程--01
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

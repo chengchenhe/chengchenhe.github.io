@@ -80,7 +80,7 @@
         
         <h1 class="mt-4 article-title page-title">Spring源码--IOC的初始化过程--01</h1>
         
-        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-06-24</p>
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-06-23</p>
         
         <div class="tags">
             <ul class="tag-list">
@@ -118,19 +118,19 @@
 </li>
 </ol>
 </li>
-<li><strong>setConfigLocations(configLocations);</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623164435741.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre><ol>
-<li>进入到==AbstractRefreshableConfigApplicationContext==类中，初始化其中的==configLocations==属性，将传入的configLocations属性赋给它，在赋值的时候还调用了<strong>resolvePath</strong>方法，由方法名可推断该方法是用来解析路径的，进入该方法<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623164820116.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>里面调用了return getEnvironment().resolveRequiredPlaceholders(path);，首先进入getEnviroment，<strong>注意：虽然getEnvironment的调用者是AbstractRefreshableConfigApplicationContext中的resolvePath方法，但getEnvironment方法其实是定义在AbstractApplicationContext中的！</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623171132333.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>里面判断了一下当前环境属性是否为空，此时为true，进入createEnviroment()，<strong>并将==AbstractApplicationContext==类中的environment属性设置为创建的environment！</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623172603751.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>createEnvironment做的事情很简单，就是new了一个StandardEnvironment对象<br> <img src="https://img-blog.csdnimg.cn/20200623205144241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li><strong>setConfigLocations(configLocations);</strong><br> <img src="https://img-blog.csdnimg.cn/20200623164435741.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
+<li>进入到==AbstractRefreshableConfigApplicationContext==类中，初始化其中的==configLocations==属性，将传入的configLocations属性赋给它，在赋值的时候还调用了<strong>resolvePath</strong>方法，由方法名可推断该方法是用来解析路径的，进入该方法<br><img src="https://img-blog.csdnimg.cn/20200623164820116.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>里面调用了return getEnvironment().resolveRequiredPlaceholders(path);，首先进入getEnviroment，<strong>注意：虽然getEnvironment的调用者是AbstractRefreshableConfigApplicationContext中的resolvePath方法，但getEnvironment方法其实是定义在AbstractApplicationContext中的！</strong><br><img src="https://img-blog.csdnimg.cn/20200623171132333.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>里面判断了一下当前环境属性是否为空，此时为true，进入createEnviroment()，<strong>并将==AbstractApplicationContext==类中的environment属性设置为创建的environment！</strong><br><img src="https://img-blog.csdnimg.cn/20200623172603751.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>createEnvironment做的事情很简单，就是new了一个StandardEnvironment对象<br><img src="https://img-blog.csdnimg.cn/20200623205144241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>进入到StandardEnvironment中，发现其并没有构造器，所以进入其父类AbstractEnvironment去进行初始化操作<br> <img src="https://img-blog.csdnimg.cn/20200623205429274.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-<li>初始化一些基本属性后，进入到构造方法中的语句，将类中的propertySources属性传入，由属性名我们可以知道该属性包含配置文件相关信息<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623173330802.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>进入该方法后发现该方法通过addLast方法将系统中的相关环境信息加入到了该属性中，但我并不是很清楚该属性是干什么的…好像是用来给子类进行一些扩展操作的？<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623173633169.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>初始化一些基本属性后，进入到构造方法中的语句，将类中的propertySources属性传入，由属性名我们可以知道该属性包含配置文件相关信息<br> <img src="https://img-blog.csdnimg.cn/20200623173330802.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入该方法后发现该方法通过addLast方法将系统中的相关环境信息加入到了该属性中<br> <img src="https://img-blog.csdnimg.cn/20200623173633169.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
 <li>回到resolvePath方法中，该调用resolveRequiredPlaceholders方法了<br> <img src="https://img-blog.csdnimg.cn/20200623173843666.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-<li>此时进入了AbstractPropertyResolver类解析文件，因为此时还没有相应解析器（上面只创建了PathMatchingResourcePatternResolver路径资源定位器），所以需要创建解析器<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623165347780.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>进入后发现创建的是==PropertyPlaceholderHelper==对象，由对象名称我们就可以推测该对象是用来帮组解析文件中的占位符的，而且传入的参数很有意思，placeholderPrefix是${，placeholderSuffix是}，valueSeparator是:，发现这些参数就是我们配置外部文件时常用的表达式（比如dataSource），继续往下走<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623165424840.png)</code></pre></li>
-<li>创建完相应的解析器后，执行doResolvePlaceholders(text, this.strictHelper);，传入配置文件名称和上一步创建的解析器<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623170203257.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
-<li>里面调用了解析器的replacePlaceholders方法，结合方法名和上面的参数，<strong>resolveRequiredPlaceholders方法实际上完成的操作是将配置文件中的占位符转换为它所代表的真实值</strong>，比如将dataSource中的 ${jdbc.driver}转换为其它配置文件中的com.mysql.cj.jdbc.Driver<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623170635172.png)</code></pre></li>
+<li>此时进入了AbstractPropertyResolver类解析文件，因为此时还没有相应解析器（上面只创建了PathMatchingResourcePatternResolver路径资源定位器），所以需要创建解析器<br> <img src="https://img-blog.csdnimg.cn/20200623165347780.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入后发现创建的是==PropertyPlaceholderHelper==对象，由对象名称我们就可以推测该对象是用来帮组解析文件中的占位符的，而且传入的参数很有意思，placeholderPrefix是${，placeholderSuffix是}，valueSeparator是:，发现这些参数就是我们配置外部文件时常用的表达式（比如dataSource），继续往下走<br><img src="https://img-blog.csdnimg.cn/20200623165424840.png" alt="在这里插入图片描述"></li>
+<li>创建完相应的解析器后，执行doResolvePlaceholders(text, this.strictHelper);，传入配置文件名称和上一步创建的解析器<br><img src="https://img-blog.csdnimg.cn/20200623170203257.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>里面调用了解析器的replacePlaceholders方法，结合方法名和上面的参数，<strong>resolveRequiredPlaceholders方法实际上完成的操作是将配置文件中的占位符转换为它所代表的真实值</strong>，比如将dataSource中的 ${jdbc.driver}转换为其它配置文件中的com.mysql.cj.jdbc.Driver<br><img src="https://img-blog.csdnimg.cn/20200623170635172.png" alt="在这里插入图片描述"></li>
 <li>一路返回，setConfigLocations(configLocations);语句执行完毕，总结<ol>
 <li>用传入的configLocations初始化==AbstractRefreshableApplicationContext==类中的configLocations属性</li>
 <li>在初始化过程中调用resolvePath方法初步解析配置文件</li>
@@ -159,19 +159,19 @@
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Spring源码--IOC的初始化过程--03</span>
+                            Spring源码--IOC的初始化过程--02</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
+                        href="/2020/06/03/MySQL--%E7%BB%83%E4%B9%A0%E9%A2%98/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Spring源码--IOC的初始化过程--02
+                            aria-hidden="true">MySQL--练习题
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -180,19 +180,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Spring源码--IOC的初始化过程--03</span>
+                            Spring源码--IOC的初始化过程--02</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
+                        href="/2020/06/03/MySQL--%E7%BB%83%E4%B9%A0%E9%A2%98/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Spring源码--IOC的初始化过程--02
+                            aria-hidden="true">MySQL--练习题
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

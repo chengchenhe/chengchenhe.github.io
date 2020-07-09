@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>Spring源码--IOC的初始化过程--01-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">Spring源码--IOC的初始化过程--01</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-06-24</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><ol>
+<li>最近开始重温Spring，觉得只知道会用是不行的，所以想尝试着结合资料观摩一下源码</li>
+<li>由于Spring源码非常的多，一步步都看完明显是不现实的，所以只记录自己觉得重要的步骤，其它细枝末节不去纠结</li>
+<li>本人才疏学浅，以下的总结完全主观，在逐渐学习的过程中也会不断更新表述不合适的地方，如果有错误希望能包涵并指出！</li>
+</ol>
+<h3 id="二、源码阅读"><a href="#二、源码阅读" class="headerlink" title="二、源码阅读"></a>二、源码阅读</h3><ol>
+<li>debug定位到容器创建位置，进入源码<br> <img src="https://img-blog.csdnimg.cn/20200623161051596.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>调用了3个参数的构造方法创建ClassPathXmlApplicationContext对象，将传入的字符串转换成一个数组<br> <img src="https://img-blog.csdnimg.cn/20200623161405259.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入到该构造方法内部，第一步为调用super(parent)初始化父类对象<br> <img src="https://img-blog.csdnimg.cn/20200623161726685.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
+<li><strong>super(parent)</strong><ol>
+<li>一路调用父类的构造方法，最后进入AbstractApplicationContext类的构造方法初始化该类<br> <img src="https://img-blog.csdnimg.cn/20200623162103820.png" alt="在这里插入图片描述"></li>
+<li>由于AbstractApplicationContext继承了DefaultResourceLoader，所以需要先初始化DefaultResourceLoader，进入到DefaultResourceLoader类中去指定默认的类加载器（上下文类加载器）<br> <img src="https://img-blog.csdnimg.cn/202006231629380.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>回到AbstractApplicationContext类中，初始化了一些容器后开始执行构造方法中的语句，从名字我们可以推测这里指定的是资源解析器<br> <img src="https://img-blog.csdnimg.cn/20200623163112456.png" alt="在这里插入图片描述"></li>
+<li>进入后发现里面创建的是==PathMatchingResourcePatternResolver==，从上面的注释我们可以知道这个解析器是用来定位需要解析资源的位置的<br> <img src="https://img-blog.csdnimg.cn/20200623163346589.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>当创建完PathMatchingResourcePatternResolver后super(parent)语句便结束了，总结<ol>
+<li>对ClassPathXmlApplicationContext的父类AbstractApplicationContext进行初始化</li>
+<li>初始化DefaultResourceLoader类，并将其中的classLoader属性指定为AppClassLoader</li>
+<li>创建PathMatchingResourcePatternResolver实例并返回给AbstractApplicationContext中的resourcePatternResolver属性</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><strong>setConfigLocations(configLocations);</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623164435741.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre><ol>
+<li>进入到==AbstractRefreshableConfigApplicationContext==类中，初始化其中的==configLocations==属性，将传入的configLocations属性赋给它，在赋值的时候还调用了<strong>resolvePath</strong>方法，由方法名可推断该方法是用来解析路径的，进入该方法<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623164820116.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>里面调用了return getEnvironment().resolveRequiredPlaceholders(path);，首先进入getEnviroment，<strong>注意：虽然getEnvironment的调用者是AbstractRefreshableConfigApplicationContext中的resolvePath方法，但getEnvironment方法其实是定义在AbstractApplicationContext中的！</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623171132333.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>里面判断了一下当前环境属性是否为空，此时为true，进入createEnviroment()，<strong>并将==AbstractApplicationContext==类中的environment属性设置为创建的environment！</strong><pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623172603751.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>createEnvironment做的事情很简单，就是new了一个StandardEnvironment对象<br> <img src="https://img-blog.csdnimg.cn/20200623205144241.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入到StandardEnvironment中，发现其并没有构造器，所以进入其父类AbstractEnvironment去进行初始化操作<br> <img src="https://img-blog.csdnimg.cn/20200623205429274.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>初始化一些基本属性后，进入到构造方法中的语句，将类中的propertySources属性传入，由属性名我们可以知道该属性包含配置文件相关信息<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623173330802.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>进入该方法后发现该方法通过addLast方法将系统中的相关环境信息加入到了该属性中，但我并不是很清楚该属性是干什么的…好像是用来给子类进行一些扩展操作的？<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623173633169.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>回到resolvePath方法中，该调用resolveRequiredPlaceholders方法了<br> <img src="https://img-blog.csdnimg.cn/20200623173843666.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>此时进入了AbstractPropertyResolver类解析文件，因为此时还没有相应解析器（上面只创建了PathMatchingResourcePatternResolver路径资源定位器），所以需要创建解析器<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623165347780.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>进入后发现创建的是==PropertyPlaceholderHelper==对象，由对象名称我们就可以推测该对象是用来帮组解析文件中的占位符的，而且传入的参数很有意思，placeholderPrefix是${，placeholderSuffix是}，valueSeparator是:，发现这些参数就是我们配置外部文件时常用的表达式（比如dataSource），继续往下走<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623165424840.png)</code></pre></li>
+<li>创建完相应的解析器后，执行doResolvePlaceholders(text, this.strictHelper);，传入配置文件名称和上一步创建的解析器<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623170203257.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70)</code></pre></li>
+<li>里面调用了解析器的replacePlaceholders方法，结合方法名和上面的参数，<strong>resolveRequiredPlaceholders方法实际上完成的操作是将配置文件中的占位符转换为它所代表的真实值</strong>，比如将dataSource中的 ${jdbc.driver}转换为其它配置文件中的com.mysql.cj.jdbc.Driver<pre><code>![在这里插入图片描述](https://img-blog.csdnimg.cn/20200623170635172.png)</code></pre></li>
+<li>一路返回，setConfigLocations(configLocations);语句执行完毕，总结<ol>
+<li>用传入的configLocations初始化==AbstractRefreshableApplicationContext==类中的configLocations属性</li>
+<li>在初始化过程中调用resolvePath方法初步解析配置文件</li>
+<li>调用==AbstractApplicationContext==中的getEnvironment方法，初始化环境变量，执行完这一步后，AbstractApplicationContext中的environment就有值了</li>
+<li>通过resolveRequiredPlaceholders方法将配置文件中的一些占位符转换为真实值（使用PropertyPlaceholderHelper）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>refresh(太长了，下一篇博客/(ㄒoㄒ)/~~)</li>
+</ol>
+</li>
+</ol>
+<h3 id="三、图像总结"><a href="#三、图像总结" class="headerlink" title="三、图像总结"></a>三、图像总结</h3><p><img src="https://img-blog.csdnimg.cn/20200628105054666.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><a href="https://pan.baidu.com/s/1v_tcmHKL0UVYfZlTTHlNTQ" target="_blank" rel="noopener">https://pan.baidu.com/s/1v_tcmHKL0UVYfZlTTHlNTQ</a><br>提取码：bqf6</p>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            Spring源码--IOC的初始化过程--03</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Spring源码--IOC的初始化过程--02
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            Spring源码--IOC的初始化过程--03</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--02/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Spring源码--IOC的初始化过程--02
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、前言"><span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、源码阅读"><span class="toc-text">二、源码阅读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、图像总结"><span class="toc-text">三、图像总结</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

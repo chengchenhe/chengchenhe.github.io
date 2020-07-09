@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>Spring源码--IOC的初始化过程--03-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">Spring源码--IOC的初始化过程--03</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-06-27</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><ol>
+<li>最近开始重温Spring，觉得只知道会用是不行的，所以想尝试着结合资料观摩一下源码</li>
+<li>由于Spring源码非常的多，一步步都看完明显是不现实的，所以只记录自己觉得重要的步骤，其它细枝末节不去纠结</li>
+<li>本人才疏学浅，以下的总结完全主观，在逐渐学习的过程中也会不断更新表述不合适的地方，如果有错误希望能包涵并指出！</li>
+</ol>
+<h3 id="二、源码阅读"><a href="#二、源码阅读" class="headerlink" title="二、源码阅读"></a>二、源码阅读</h3><ol>
+<li>接着02博客，到doLoadBeanDefinitions(inputSource, encodedResource.getResource())<br> <img src="https://img-blog.csdnimg.cn/20200626164349819.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li><strong>doLoadBeanDefinitions</strong><ol>
+<li>进来首先执行doLoadDocument来获得一个Document对象，点进去看看<br> <img src="https://img-blog.csdnimg.cn/20200626165447101.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进来后先读注释：使用配置的DocumentLoader实际加载指定的文档。documentLoader对象是在初始化该类XmlBeanDefinitionReader的时候就创建好了的，实例为DefaultDocumentLoader，调用该对象的loadDocument去解析文件，传入了5个参数，一个个看<br> <img src="https://img-blog.csdnimg.cn/20200627092039305.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ol>
+<li>inputSource：包含解析文件信息的IO流对象</li>
+<li>getEntityResolver()：获得XmlBeanDefinitionReader中的entityResolver属性，该属性是我们在初始化xml解析器时设置的，里面主要包含xml中相关的xsd<br> <img src="https://img-blog.csdnimg.cn/20200626171703330.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>errorHandler：出现错误时的处理类</li>
+<li>getValidationModeForResource(resource)：进入该方法，由上面的注释我们知道这是决定给定资源验证模式的，VALIDATION_AUTO和VALIDATION_XSD都是int类型的final常量，决定相应验证方法的，同时由注释知道我们也可以自己指定验证模式通过覆写该方法<br> <img src="https://img-blog.csdnimg.cn/2020062709143296.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>isNamespaceAware()：返回XML解析器是否应支持XML命名空间(false)<br> <img src="https://img-blog.csdnimg.cn/20200627091917360.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li>进入loadDocument方法，里面主要就是通过工厂构建DocumentBuilder对象，用该对象去解析配置文件，具体解析过程就不点进去看了，看不懂…<br> <img src="https://img-blog.csdnimg.cn/20200627092319141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>回到doLoadBeanDefinitions，执行完doLoadDocument后返回了一个Document对象，在控制台查看该对象，发现此时已经把配置文件相关信息都放进去了<br> <img src="https://img-blog.csdnimg.cn/20200627092532945.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>有了Document对象后，开始注册BeanDefinitions，将创建好的doc对象和资源对象传入，返回一个int值，由下面的代码我们指定该count代表的就是一共有多少个注册的bean对象，进入该方法<br> <img src="https://img-blog.csdnimg.cn/2020062709272170.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入后先是构造了一个BeanDefinitionDocumentReader对象，然后调用getRegistry().getBeanDefinitionCount()获得之前注册的bean对象个数，点进该方法看看<br> <img src="https://img-blog.csdnimg.cn/2020062709310242.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>getRegistry方法，返回AbstractBeanDefinitionReader类中的registry属性，该属性是我们在实例化XmlBeanDefinitionReader时，由它调用父类AbstractBeanDefinitionReader的构造方法时设置的，实例为DefaultListableBeanFactory<br> <img src="https://img-blog.csdnimg.cn/20200627093148184.png" alt="在这里插入图片描述"></li>
+<li>getBeanDefinitionCount就是获得DefaultListableBeanFactory类中beanDefinitionMap的个数，但显然我们之前没有注册过bean，所以此时返回0<br> <img src="https://img-blog.csdnimg.cn/20200627093454572.png" alt="在这里插入图片描述"></li>
+<li>由创建的BeanDefinitionDocumentReader调用方法开始注册bean，此时第二个参数为创建一个XmlReaderContext实例，不看创建步骤了，进入该方法<br> <img src="https://img-blog.csdnimg.cn/20200627093913371.png" alt="在这里插入图片描述"></li>
+<li>进入到了DefaultBeanDefinitionDocumentReader类中，先把创建好的XmlReaderContext实例赋给该类的readerContext属性，之后调用doRegisterBeanDefinitions，继续进入<br><img src="https://img-blog.csdnimg.cn/20200627094130511.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进来先尝试获得DefaultBeanDefinitionDocumentReader类中的delegate属性，这个属性我们之前没有设置过，返回null<br><img src="https://img-blog.csdnimg.cn/20200627094451390.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>返回了null对象后，下一步就是创建delegate属性了，点进去看看<br><img src="https://img-blog.csdnimg.cn/20200627094632474.png" alt="在这里插入图片描述"></li>
+<li>通过BeanDefinitionParserDelegate的构造方法去实例化该对象并返回，此时我们并不是很确定delegate属性代表的是什么，点BeanDefinitionParserDelegate类中看看<br><img src="https://img-blog.csdnimg.cn/20200627094717422.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>发现该类中定义了很多常量，都是我们在配置文件时常用的配置属性，所以此时我们可以推断delegate属性中肯定有包含解析时用于匹配相应属性的容器<br><img src="https://img-blog.csdnimg.cn/20200627094857339.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>回到doRegisterBeanDefinitions方法中，用创建的delegate属性去验证传入的是否是一个根对象，document对象显然是，进入if，里面做了一些判断，其实什么都没干，跳过到下面的preProcessXml<br><img src="https://img-blog.csdnimg.cn/20200627095425478.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>点进preProcessXml(root)方法和postProcessXml(root)方法，发现里面也是什么都没干，这2个方法也是留给子类做扩展的，用于在注册bean前和注册bean后干点事<br><img src="https://img-blog.csdnimg.cn/20200627095551303.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入parseBeanDefinitions方法，先是通过getChildNodes获取到传入的根节点中的所有子元素，之后开始遍历<br><img src="https://img-blog.csdnimg.cn/20200627151843765.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>遍历的时候有2种情况，第一种是DefaultElement，即默认标签（不引入命名空间也可正常使用的标签），其它的都是CustomElement，我们在配置文件中先配置的是注解扫描，也就是&lt;context:component-scan base-package=”com.hcc”/&gt;所以先进入else中，进入该方法<br><img src="https://img-blog.csdnimg.cn/2020062715453594.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>去到了BeanDefinitionParserDelegate类中，里面由调用了重载方法，多了一个参数null，继续往下走<br><img src="https://img-blog.csdnimg.cn/20200627154754102.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>由上面定义的形参我们知道传入的null是一个BeanDefinition对象，该方法第一步获取到namespaceUri，即该配置对应的是哪一个命名空间<br><img src="https://img-blog.csdnimg.cn/20200627155033941.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>解析namespaceUri，去获得相应的处理器handler，注意：不同的命名空间会有不同的处理器，具体可以在命名空间对应的源码目录下的MTEA-INF/spring.handlers文件中查看，之后调用处理器的parse方法继续解析<br><img src="https://img-blog.csdnimg.cn/20200628175350192.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>里面通过findParserForElement方法获得具体的解析类，在同一个命名空间中，不同的标签也会对应不同的解析类，之后调用解析类的parse方法解析对应标签，所有解析类在解析完后都会将标签信息封装成BeanDefinitionHolder对象，并将其注册到工厂中<br><img src="https://img-blog.csdnimg.cn/20200628175620848.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>将beanDefinition对象注册到工厂中，进入该方法<br><img src="https://img-blog.csdnimg.cn/20200627174501462.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>一路往下走最终回到了我们熟悉的DefaultListableBeanFactory类中，将刚创建好的beanDefinition添加到工厂容器中，<strong>注意：此时所有注册的对象实例还没有创建，只是往容器中添加了bean信息</strong><br><img src="https://img-blog.csdnimg.cn/20200627174847172.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>因为我们只有一个对象需要注册，所以在工厂添加完后便一路返回，最终回到parseBeanDefinitions中，解析下一个document对象<img src="https://img-blog.csdnimg.cn/2020062717505569.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>当所有的document对象解析完成后，就会一路返回最终回到refresh方法中，工厂对象就创建完了，现在我们知道obtainFreshBeanFactory语句不仅仅时创建工厂，其中还包括解析xml文件，将bean信息注册到工厂中<img src="https://img-blog.csdnimg.cn/20200627175541216.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>边看边写太累了/(ㄒoㄒ)/~~，后续的只画图算了，有需要的下面网址自取</li>
+</ol>
+</li>
+</ol>
+<h3 id="三、图像总结"><a href="#三、图像总结" class="headerlink" title="三、图像总结"></a>三、图像总结</h3><p><img src="https://img-blog.csdnimg.cn/20200628173942751.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>链接：<a href="https://pan.baidu.com/s/1_3dNVCsFp7o1_KzS9FYdPA" target="_blank" rel="noopener">https://pan.baidu.com/s/1_3dNVCsFp7o1_KzS9FYdPA</a><br>提取码：7wt8</p>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Spring源码--IOC的初始化过程--01
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/06/24/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--01/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Spring源码--IOC的初始化过程--01
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、前言"><span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、源码阅读"><span class="toc-text">二、源码阅读</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、图像总结"><span class="toc-text">三、图像总结</span></a></li></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

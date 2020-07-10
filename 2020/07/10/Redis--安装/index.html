@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>何承宸的个人网站</title>
+    <title>Redis--安装-何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -18,7 +18,6 @@
 <link rel="stylesheet" href="/css/adagio.css">
 
 <meta name="generator" content="Hexo 4.2.0"></head>
-
 <body>
     <div class="container-fluid">
     <nav class="nav">
@@ -64,7 +63,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 
-                <li class="nav-item pl-2 pr-2 active">
+                <li class="nav-item pl-2 pr-2 ">
                     <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
                 </li>
                 
@@ -78,124 +77,103 @@
 
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="mt-4 article-title page-title">ARCHIVE: </h1>
+        
+        <h1 class="mt-4 article-title page-title">Redis--安装</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-07-10</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
     </div>
 </div>
     <div class="container">
-        <div class="row mt-3">
-            <div class="col-md-9">
-                
+        <div class="row">
+            <div class="col-md-9 pt-2">
                 <div class="row">
-                    <div class="col">
-                        <a href="/2019/10/15/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3JVM--%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%85%A8%E8%BF%87%E7%A8%8B/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">深入理解JVM--类加载全过程</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2019-10-15</h6>
-                            </div>
-                        </a>
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><h3 id="一、复制虚拟机"><a href="#一、复制虚拟机" class="headerlink" title="一、复制虚拟机"></a>一、复制虚拟机</h3><ol>
+<li>鉴于我每次都忘记怎么复制虚拟机，决定将整个过程记录下来，我不要面向百度编程ฅ(๑ ̀ㅅ ́๑)ฅ</li>
+<li>创建完整克隆（node02：basic）<br><img src="https://img-blog.csdnimg.cn/20200710211731270.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入/etc/udev目录下，进入70-persistent-net.rules文件中，记录eth1的ATTR<br><img src="https://img-blog.csdnimg.cn/20200710212015718.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入/etc/sysconfig 目录下，修改network文件，将虚拟机名称修改为新的名称<br><img src="https://img-blog.csdnimg.cn/2020071021211628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>进入/etc/sysconfig/network-scripts目录下，修改ifcfg-eth0文件中的DEVICE、HWADDR、IPADDR属性，HWADDR属性为之前记录的值<img src="https://img-blog.csdnimg.cn/20200710212449540.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>service network restart重启网络服务，ping百度查看是否成功<br><img src="https://img-blog.csdnimg.cn/20200710212553650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>执行chkconfig iptables off命令来关闭防火墙</li>
+</ol>
+<h3 id="二、redis安装"><a href="#二、redis安装" class="headerlink" title="二、redis安装"></a>二、redis安装</h3><ol>
+<li>执行yum install wget 安装wget指令</li>
+<li>进入想安装的文件夹中，我这里直接在root文件夹下安装了</li>
+<li>执行wget <a href="http://download.redis.io/releases/redis-5.0.5.tar.gz" target="_blank" rel="noopener">http://download.redis.io/releases/redis-5.0.5.tar.gz</a> 命令来下载redis压缩包</li>
+<li>执行tar xf  redis….tar.gz 解压下载后的压缩包<br><img src="https://img-blog.csdnimg.cn/20200710213357124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>执行cd redis-5.0.5/src 进入解压好的redis文件夹的src目录下，此时该编译安装redis了，但我们此时没有安装编译器，所以执行yum install gcc命令来安装编译器</li>
+<li>在redis文件夹中执行make命令编译安装redis，如果此前不小心执行了误操作，可以执行make distclean命令来清除已安装的redis文件</li>
+<li>安装完成后，执行./redis-server 命令就可以正常启动redis了<br><img src="https://img-blog.csdnimg.cn/20200710214320834.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>但显然这并不是我们想要的结果，我们想要的是将redis变成一个服务，在开机时自启动，而不是我们手动启动，使用ctrl+c退出该页面，接下来配置redis服务</li>
+</ol>
+<h3 id="三、配置redis服务"><a href="#三、配置redis服务" class="headerlink" title="三、配置redis服务"></a>三、配置redis服务</h3><ol>
+<li>执行make install PREFIX=/opt/cc/redis5 将redis可执行文件装入该文件夹下</li>
+<li>此时进入redis5文件夹下的bin目录下，会发现已经有redis主要的执行文件了<br><img src="https://img-blog.csdnimg.cn/20200710214948175.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>接下来需要配置环境变量了，执行vi /etc/profile，进入文件最下方</li>
+<li>添加export REDIS_HOME=/opt/cc/redis5  和  export PATH=$ PATH:$ REDIS_HOME/bin两句话,之后保存退出（注：因博客编辑原因，上面的$后面添加了多余的空格）<br><img src="https://img-blog.csdnimg.cn/20200710220804650.png" alt="在这里插入图片描述"></li>
+<li>执行source /etc/profile 更新profile文件</li>
+<li>进入一开始解压的redis-5.0.5目录下的utils文件夹<br><img src="https://img-blog.csdnimg.cn/2020071022101677.png" alt="在这里插入图片描述"></li>
+<li>执行./install_server.sh 命令开始配置redis，若不想指定端口的话一路enter便可以了<br><img src="https://img-blog.csdnimg.cn/20200710221257137.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>若想创建多个redis，执行多次./install_server.sh，每次指定不同的端口号即可</li>
+<li>配置完成后可以通过service redis_端口号 start/stop/status 或 ps -fe | grep redis来查看redis对应状态<br><img src="https://img-blog.csdnimg.cn/20200710221649764.png" alt="在这里插入图片描述"> </li>
+</ol>
+</article>
+                        </main>
+                        
+                        
                     </div>
                 </div>
-                <hr class="row">
-                
-                <div class="row">
-                    <div class="col">
-                        <a href="/2019/08/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E6%80%BB%E7%BB%93/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">大话设计模式读后感(1-15章)</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2019-08-31</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <hr class="row">
-                
-                <div class="row">
-                    <div class="col">
-                        <a href="/2019/08/10/linux%E5%AD%A6%E4%B9%A0%EF%BC%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">linux简介与基本使用环境搭建</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2019-08-10</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <hr class="row">
-                
-                <div class="row">
-                    <div class="col">
-                        <a href="/2019/07/26/%E6%96%B0%E5%BB%BA%E5%8D%9A%E5%AE%A2%E8%BF%87%E7%A8%8B%E6%80%BB%E7%BB%93/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">新建博客过程总结</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2019-07-26</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <hr class="row">
-                
-                <div class="row">
-                    <div class="col">
-                        <a href="/2019/07/26/hello-world/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">Hello World</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2019-07-26</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <hr class="row">
-                
-                <div class="paginator">
-                    <div class="row">
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
     <div class="col">
         <nav aria-label="paginator" class="paginator">
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
-                <li class="page-item ">
+                <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/archives/page/2/"
+                        href=""
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Newer</span>
+                            No more</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item  disabled ">
+                <li class="page-item ">
                     <a class="page-link"
-                        href="/"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Older
+                            aria-hidden="true">Spring源码--IOC的初始化过程--03
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
                 </li>
             </ul>
             <ul class="pagination d-md-none justify-content-center">
-                <li class="page-item ">
+                <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/archives/page/2/"
+                        href=""
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Newer</span>
+                            No more</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item  disabled ">
+                <li class="page-item ">
                     <a class="page-link"
-                        href="/"
+                        href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Older
+                            aria-hidden="true">Spring源码--IOC的初始化过程--03
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -207,145 +185,32 @@
 
 
 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 mt-3">
-                
-    <div class="row">
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
     <div class="col">
         <h6>APPLAUSE FOR ME</h6>
         <div id="applause-easy"></div>
     </div>
 </div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>FEATURED TAGS</h6>
-        <div class="tags">
-            
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>ABOUT ME</h6>
-        <div class="row">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <div class="col-8 text-center">
-                        <img src="https://s2.ax1x.com/2019/08/22/m0TGVS.png" alt="avatar" class="img-thumbnail">
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、复制虚拟机"><span class="toc-text">一、复制虚拟机</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、redis安装"><span class="toc-text">二、redis安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、配置redis服务"><span class="toc-text">三、配置redis服务</span></a></li></ol>
+                        </div>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col text-center">
-                        <p class="text-muted">坠欢莫拾，酒痕在衣</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-2 sidebar-socialmedia">
-            <div class="row">
-    <div class="col text-center">
-        <ul class="list-inline">
-            
-            <li class="list-inline-item">
-                
-                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-        </ul>
-    </div>
-</div>
-
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>CONTACT</h6>
-        <address>
-            <strong>何承宸</strong><br>
-            南京航天航空大学金城学院 <br/> 软工二班
-        </address>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>ARCHIVES</h6>
-        <div class="archive">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a></li></ul>
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <ul class="list-inline">
-            <h6>FRIENDS</h6>
-            
-            <li class="list-inline-item"><a href="https://hexo.io" target="_blank" rel="noopener"><span class="text-muted">Hexo</span></a>
-            </li>
-            
-            <li class="list-inline-item"><a href="https://github.com" target="_blank" rel="noopener"><span class="text-muted">Github</span></a>
-            </li>
-            
-        </ul>
-    </div>
-</div>
-    <hr class="row">
-
             </div>
         </div>
     </div>
@@ -485,6 +350,19 @@ $(document).ready(function() {
 </script>
 
 
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
 </body>
-
 </html>

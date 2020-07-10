@@ -82,6 +82,29 @@
                     
                     <div class="row">
     <div class="col">
+        <a href="/2020/07/10/Redis--%E5%AE%89%E8%A3%85/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">Redis--安装</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-07-10</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    一、复制虚拟机
+鉴于我每次都忘记怎么复制虚拟机，决定将整个过程记录下来，我不要面向百度编程ฅ(๑ ̀ㅅ ́๑)ฅ
+创建完整克隆（node02：basic）
+进入/etc/udev目录下，进入70-persistent-net.rules文件中，记录eth1的ATTR
+进入/etc/sysconfig 目录下，修改network文件，将虚拟机名称修改为新的名称
+进入/etc/sysconfig...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
         <a href="/2020/06/27/Spring%E6%BA%90%E7%A0%81--IOC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B--03/" class="index-card-link">
             <div class="card-body index-card-box">
                 <h4 class="card-title text-dark article-title">Spring源码--IOC的初始化过程--03</h4>
@@ -277,42 +300,6 @@ AQS的核心思想是，如果被请求的共享资源空闲，则将当前请�
 
 悲观锁：悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会block直到拿到锁。java中的悲观锁就是Synchronized,AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才会转换为悲观锁，如RetreenLock
 乐观锁：乐观锁...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/05/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E5%9F%BA%E7%A1%80/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">多线程--基础</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-05-03</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    
-创建线程的三方式
-
-继承Thread类，重写run()方法
-
-实现Runnable接口，重写run()方法 
-
-使用线程池创建（ThreadPoolExecutor 或 Executors）：本质上依旧是前两种
-
-小案例：龟兔赛跑
- 
-
-
-
-线程的几种状态
-
-NEW：尚未启动的线程处于此状态（新生）
-RUNNABLE：在Java虚拟机中执行的线程处于这种状态（就绪或者运行）
-TIME_WA...
                 </p>
             </div>
         </a>

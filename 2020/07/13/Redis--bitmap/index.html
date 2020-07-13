@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>何承宸的个人网站</title>
+    <title>Redis--bitmap-何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -18,7 +18,6 @@
 <link rel="stylesheet" href="/css/adagio.css">
 
 <meta name="generator" content="Hexo 4.2.0"></head>
-
 <body>
     <div class="container-fluid">
     <nav class="nav">
@@ -64,7 +63,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 
-                <li class="nav-item pl-2 pr-2 active">
+                <li class="nav-item pl-2 pr-2 ">
                     <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
                 </li>
                 
@@ -78,61 +77,121 @@
 
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="mt-4 article-title page-title">ARCHIVE: 2020</h1>
+        
+        <h1 class="mt-4 article-title page-title">Redis--bitmap</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-07-13</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
     </div>
 </div>
     <div class="container">
-        <div class="row mt-3">
-            <div class="col-md-9">
-                
+        <div class="row">
+            <div class="col-md-9 pt-2">
                 <div class="row">
-                    <div class="col">
-                        <a href="/2020/07/13/Redis--bitmap/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">Redis--bitmap</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2020-07-13</h6>
-                            </div>
-                        </a>
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p> <strong><em>本文主要描述 redis中bitmap相应函数及使用方法</em></strong></p>
+<ol>
+<li><strong>setbit key offset value：以二进制形式设置key-value键值对</strong><ol>
+<li>key:目标主键</li>
+<li>offset:偏移量</li>
+<li>value：目标值，只能取0或1</li>
+<li>示例 :setbit k1 7 1 :0000 0001</li>
+<li>注意：在redis中，是以字节为单位读取数据的，一个字节8位</li>
+</ol>
+</li>
+</ol>
+<ol start="2">
+<li><p><strong>bitcount key [start end]：取得目标key目标范围内1的个数</strong></p>
+<ol>
+<li>key:目标主键</li>
+<li>start:开始位置，最下的下标是0,(0,1,2…)</li>
+<li>end:结束位置，可以用-1代表value的最后一个值(-1,-2,-3…)</li>
+<li>注意：这里的下标是以字节为单位的，比如bitcount key 0 1 取的是该key代表的value前8位1的个数</li>
+</ol>
+</li>
+<li><p><strong>bitpos key bit [start end]：取得目标key对应value目标范围内最早出现bit的下标</strong></p>
+<ol>
+<li>key:目标主键</li>
+<li>bit:目标数，0或1</li>
+<li>start:开始位置</li>
+<li>end:结束位置</li>
+</ol>
+</li>
+<li><p><strong>bitop operation destkey key [key…]：将给定的目标key作计算，结果封装到destkey中</strong></p>
+<ol>
+<li>operation:运算符，取or或者and</li>
+<li>destkey:结果对应的key</li>
+<li>key [key…]:目标key</li>
+</ol>
+</li>
+<li><p><strong>bitmap使用案例：用户系统，统计目标范围内用户的登录天数</strong></p>
+<ol>
+<li>思路：<ol>
+<li>使用setbit，以用户的id作为key，天数作为偏移量，若登录则设置为1</li>
+<li>使用bitcount，目标范围内有多少个1，则代表用户登录了多少天</li>
+</ol>
+</li>
+<li>粗略实现<ol>
+<li>setbit sean 1 1 :该用户在今年第一天登陆了</li>
+<li>setbit sean 7 1 :该用户在今年第7天登陆了</li>
+<li>setbit sean 364 1 :该用户在今年第364天登陆了</li>
+<li>bitcount sean -2 -1 :得到用户在今年最后7天的登录情况</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>bitmap使用案例: 若淘宝组织一个活动，在双十一当天登陆的用户都能获得一件礼物，而淘宝注册用户为2E，该准备多少礼物合适</strong></p>
+<ol>
+<li>思路：<ol>
+<li>使用setbit，以日期作为key，用户id作为偏移量，1代表该用户在今天登陆了</li>
+<li>使用bitop，计算用户月活量或者去年双十一用户数用作数据参考</li>
+</ol>
+</li>
+<li>粗略实现<ol>
+<li>setbit 20190101   1  1 :在这个日期，id为1的用户登陆了</li>
+<li>setbit 20190102   1  1 :在这个日期，id为1的用户登陆了</li>
+<li>setbit 20190102   7  1 :在这个日期，id为7的用户登陆了</li>
+<li>bitop  or   destkey 20190101  20190102 :或运算，计算这2天登陆的用户数</li>
+<li>BITCOUNT  destkey  0 -1 :取值</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</article>
+                        </main>
+                        
+                        
                     </div>
                 </div>
-                <hr class="row">
-                
-                <div class="row">
-                    <div class="col">
-                        <a href="/2020/07/10/Redis--%E5%AE%89%E8%A3%85/" class="index-card-link">
-                            <div class="card-body index-card-box">
-                                <h4 class="card-title text-dark article-title">Redis--安装</h4>
-                                <h6 class="card-subtitle mt-2 text-muted">
-                                    By Anonymous
-                                    ; Published on 2020-07-10</h6>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <hr class="row">
-                
-                <div class="paginator">
-                    <div class="row">
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
     <div class="col">
         <nav aria-label="paginator" class="paginator">
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/"
+                        href=""
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Newer</span>
+                            No more</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item  disabled ">
+                <li class="page-item ">
                     <a class="page-link"
-                        href="/"
+                        href="/2020/07/10/Redis--%E5%AE%89%E8%A3%85/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Older
+                            aria-hidden="true">Redis--安装
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -141,19 +200,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/"
+                        href=""
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Newer</span>
+                            No more</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item  disabled ">
+                <li class="page-item ">
                     <a class="page-link"
-                        href="/"
+                        href="/2020/07/10/Redis--%E5%AE%89%E8%A3%85/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Older
+                            aria-hidden="true">Redis--安装
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -165,145 +224,32 @@
 
 
 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 mt-3">
-                
-    <div class="row">
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
     <div class="col">
         <h6>APPLAUSE FOR ME</h6>
         <div id="applause-easy"></div>
     </div>
 </div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>FEATURED TAGS</h6>
-        <div class="tags">
-            
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>ABOUT ME</h6>
-        <div class="row">
-            <div class="col">
-                <div class="row justify-content-center">
-                    <div class="col-8 text-center">
-                        <img src="https://s2.ax1x.com/2019/08/22/m0TGVS.png" alt="avatar" class="img-thumbnail">
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col text-center">
-                        <p class="text-muted">坠欢莫拾，酒痕在衣</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-2 sidebar-socialmedia">
-            <div class="row">
-    <div class="col text-center">
-        <ul class="list-inline">
-            
-            <li class="list-inline-item">
-                
-                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-            <li class="list-inline-item">
-                
-                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
-                    <span class="fa-stack fa-2x icon-link">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
-                    </span>
-                </a>
-                
-            </li>
-            
-        </ul>
-    </div>
-</div>
-
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>CONTACT</h6>
-        <address>
-            <strong>何承宸</strong><br>
-            南京航天航空大学金城学院 <br/> 软工二班
-        </address>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <h6>ARCHIVES</h6>
-        <div class="archive">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a></li></ul>
-        </div>
-    </div>
-</div>
-    <hr class="row">
-
-
-    <div class="row">
-    <div class="col">
-        <ul class="list-inline">
-            <h6>FRIENDS</h6>
-            
-            <li class="list-inline-item"><a href="https://hexo.io" target="_blank" rel="noopener"><span class="text-muted">Hexo</span></a>
-            </li>
-            
-            <li class="list-inline-item"><a href="https://github.com" target="_blank" rel="noopener"><span class="text-muted">Github</span></a>
-            </li>
-            
-        </ul>
-    </div>
-</div>
-    <hr class="row">
-
             </div>
         </div>
     </div>
@@ -443,6 +389,19 @@ $(document).ready(function() {
 </script>
 
 
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
 </body>
-
 </html>

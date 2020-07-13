@@ -82,6 +82,36 @@
                     
                     <div class="row">
     <div class="col">
+        <a href="/2020/07/13/Redis--bitmap/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">Redis--bitmap</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-07-13</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                     本文主要描述 redis中bitmap相应函数及使用方法
+
+setbit key offset value：以二进制形式设置key-value键值对
+key:目标主键
+offset:偏移量
+value：目标值，只能取0或1
+示例 :setbit k1 7 1 :0000 0001
+注意：在redis中，是以字节为单位读取数据的，一个字节8位
+
+
+
+
+bitcount key [start ...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
         <a href="/2020/07/10/Redis--%E5%AE%89%E8%A3%85/" class="index-card-link">
             <div class="card-body index-card-box">
                 <h4 class="card-title text-dark article-title">Redis--安装</h4>
@@ -278,28 +308,6 @@ AQS的核心思想是，如果被请求的共享资源空闲，则将当前请�
 缓存一致性协议
 由于CPU运行速度很快，内存运行速度很慢，频繁的读取内存中的数据显然效率不高，所以CPU会通过读取缓存行（一行64个字节，因为CPU寄存器就是64个字节）的方式将内存中可能使用的数据读入CPU内部。但在读取缓存过程中别的进程可能会修改数据，这样就会导致数据不一致的问题，所以需要缓存一致性协议。
 ...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/05/04/%E5%A4%9A%E7%BA%BF%E7%A8%8B--synchronized/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">多线程--synchronized</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-05-04</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    
-锁的类型：锁从宏观角度上分为悲观锁和乐观锁
-
-悲观锁：悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会block直到拿到锁。java中的悲观锁就是Synchronized,AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才会转换为悲观锁，如RetreenLock
-乐观锁：乐观锁...
                 </p>
             </div>
         </a>

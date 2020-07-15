@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>Redis--AKF架构-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">Redis--AKF架构</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-07-15</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><ol>
+<li><p><strong>AKF架构</strong></p>
+<ol>
+<li>由于redis是单进程、单线程、单实例的，所以如果我们只使用一个redis与客户端交互就会带来单点故障、缓存容量、压力等一系列问题，如下图所示<br><img src="https://img-blog.csdnimg.cn/20200715105859978.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>基于以上三种问题，人们提出了AKF架构，其中，x轴的扩展为redis的全量镜像，保证当前redis挂掉之后服务依然可以正常提供，而且x轴上的redis实例可以向client提供一些服务，缓解压力<br><img src="https://img-blog.csdnimg.cn/20200715110827565.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>x轴的扩展有效的缓解了压力和单点故障的问题，但是依旧没有解决容量的问题，毕竟由于要保持数据一致，其中一个满了，其它的也会满，所以，y轴的扩展就是基于业务，不同的场景使用不同的redis<br><img src="https://img-blog.csdnimg.cn/20200715113531971.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>同样的道理，z轴的扩展就是将数据根据优先级进行更细粒度的划分，进一步降低数据的耦合度<br> <img src="https://img-blog.csdnimg.cn/20200715114029325.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>到了这里AKF的架构图已经画出来了，但其中依旧有许多存在的问题，这里我们首先要明确一点，在一台服务器中，无论我们后面分了多少redis，有多少集群，对用户来说都是不可见的，用户只负责调用服务，因此，这时我们就需要考虑以下的问题<ol>
+<li>X轴上的全量拷贝怎么实现？如何操作？</li>
+<li>Y轴上根据业务场景的划分怎么实现？</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>主从复制</strong></p>
+<ol>
+<li>解决上面提出的第一个问题，全量拷贝使用redis提供的RDB方式很容易便可实现，但是所有的redis实例显然不能同时提供读写服务，若是都提供写服务，需要考虑数据同步的问题，这会明显拖慢redis的速度，违背了redis的设计初衷。因此，大部分情况下，是由一个redis实例提供读写服务，其它的redis实例只提供读服务，这就是redis的主从复制，提供完整服务的redis为主，其它为从</li>
+<li>基于主从复制搭建了集群后，我们就需要考虑数据一致性的问题了，主redis写入数据后，从redis如何知道，如何同步？有三种思路<ol>
+<li>同步阻塞：主redis写入数据后，从redis进入阻塞状态同步数据，这个状态下不提供服务，但这显然是不可取的，破坏了可用性<br><img src="https://img-blog.csdnimg.cn/20200715120217584.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>异步（redis选择的方式）：在同步数据的同时，从redis继续提供服务，但由于是异步的，所以可能导致数据未能成功读取，视作丢失数据<br><img src="https://img-blog.csdnimg.cn/20200715120311213.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>使用中间代理，在主redis和从redis间使用一种其它集群技术（例如kafka），该集群必须拥有高可靠性和响应时间短的特点。在主redis更新完数据后，同步到中间代理上，中间代理阻塞从redis，更新数据，自己代替从redis提供服务。该方法虽然依旧有可能丢失数据，但明显比上面的更可靠。为什么redis不使用该方法？保证redis的快！<br><img src="https://img-blog.csdnimg.cn/20200715121136205.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ol>
+</li>
+<li>了解了数据一致性后，我们会发现一个新的问题：主redis只有一台，它down掉了怎么办？芜湖，又回到最初的起点~(๑´ㅂ`๑)。但其实是有些不一样的，由于我们有了从redis，而数据又和主redis一致，显然我们可以从中挑选一个新的主redis，其它redis继续跟随它，继续提供服务，这就牵扯redis的哨兵机制了。<ol>
+<li>首先，显然不可能由用户发现不对后再告诉redis主redis挂了，从redis是可以根据连接来判断主redis的状态的，由于从redis也可能出现故障，所以redis内部规定需要有一半的从redis认为主redis挂了，才能采取相应的操作，这个时候，从redis的数量选择就需要斟酌一下了<br><img src="https://img-blog.csdnimg.cn/2020071512313614.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200715123601787.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>在主redis挂掉之后，所有的哨兵会通过投票的方式选出一个新的主redis，其它从redis继续追随该主redis</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>容量问题解决方案</strong></p>
+<ol>
+<li>回到上面提出的第二个问题，Y轴上根据业务场景划分怎么实现，以下有几个方案以供讨论<ol>
+<li>在有多台服务器的情况下，我们可以通过逻辑代码的控制，将不同类型的数据交给不同的redis服务端处理，但是当数据无法分类，或者没有多台服务器的情况下，我们该如何划分呢？</li>
+<li>采用hash算法，对所有的数据进行取模运算，再根据结果来划分该存入到哪个redis实例中。但模数值显然是我们一开始就需要指定的，这样当后期遇到什么情况时，扩展就会变得相对困难。<br><img src="https://img-blog.csdnimg.cn/20200715191307644.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>采用随机的方式，将数据随机分不到不同的redis实例中。但使用该方法将导致数据不能精确取出，毕竟你无法判断最近的数据存到了哪个redis中，该模式最常用的地方是消息队列<br><img src="https://img-blog.csdnimg.cn/20200715191619302.png" alt="在这里插入图片描述"></li>
+<li>采用kemata一致性哈希算法<br>&ensp;&ensp;&ensp;一致性哈希算法是一种映射算法，将key和设备进行哈希计算，映射到一个哈希环上。在哈希环上绝大部分点是虚拟的，但有一部分点是物理的，即设备与环的映射点。增加虚拟节点的主要目的是为了解决数据倾斜的问题。当我们想设备中存数据的时候，实际上是对数据的key做一致性哈希算法，将得到的值映射到哈希环上，并向左右两边分别寻找设备，找到离他最近的一台设备的物理点，通过物理点将数据写入设备<br><img src="https://img-blog.csdnimg.cn/20200715192550894.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>&ensp;&ensp;&ensp;但是这里存在一个问题，当device3插入到哈希环上的时候，假设我们刚刚把数据存到了device2，这个时候由于device3的加入，有些数据就查不到了，因为查询时是寻找离他最近的物理点。因此，该算法可能造成redis的击穿，即redis中有数据但依然像数据库中进行查找。由于相同的问题，使用该算法的redis更倾向于缓存而不是数据库，因为数据库必须保证数据的完整性！</li>
+<li>在client端和server间添加代理层，由代理来实现上面所述的逻辑代码，这样我们只需要关注代理的性能便可以了，当然，代理也必须是集群，不然依旧会出现单点故障的问题。但是redis并不推荐这种方法，原因依旧是redis想尽可能的保证轻量，尽可能的快！<br><img src="https://img-blog.csdnimg.cn/20200715201252277.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+<li>说了这么多，redis自身到底是使用哪种方式来解决该问题的呢？答案是预分区<br><img src="https://img-blog.csdnimg.cn/20200715201526231.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>如上图，假设在client端采用取模算法得到了hash值有0-9十个数，现在有三台redis，每一台redis都有一个哈希映射，client端可以通过映射去redis寻找数据，并且每台redis还有其他两台redis的映射表。客户端如果想找key为3的数据，那么先随机找一个redis，redis对key进行取模然后去自己的映射表找有没有能和取模后的数对应上的，有的话直接返回数据，没有的话在其他两个redis的映射表中去寻找是否还有该key，没有的话告诉没找到，有的话返回客户端让他重定向到另一个redis，定位到了redis3。基于此方式，redis自身很难实现事务相关操作，需要由用户控制。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>零碎知识点</strong></p>
+<ol>
+<li>replicaof host port ： 将当前redis实例作为从redis，host为主redis ip地址，port为端口号，若输入replicaof no one则代表当前redis实例脱离主redis</li>
+<li>当初次完成追随后，从redis中的数据会被清空，将用RDB的方式从主redis中拿取数据</li>
+<li>当从redis挂掉后，若在一段时间内再次联系上主redis，则会有以下两种情况<ol>
+<li>若在配置文件中配置了必须使用AOF方式来转移数据，则一定会导致从redis中原有数据被清空，重新读入数据，因为AOF文件中并不会记录相关的主从信息</li>
+<li>若配置文件中没有指定必须用AOF方式转移数据，则会判断此时的数据是否超过repl-backlog-size配置的值，没超过则使用AOF添加数据，超过了则重新读入数据。比如若repl-backlog-size设置的值为5m，则当从redis重新追随主redis时，判断从它挂掉的时间点到现在主redis是否写入了超过5m的数据，未超过则代表还有救，可以使用AOF往后追加数据，超过了则表示没救了，重新写入！</li>
+</ol>
+</li>
+<li>启动哨兵：redis-server   配置文件路径(里面写需要监控的redis)   –sentinel，下面是配置文件最简单的写法<br> <img src="https://img-blog.csdnimg.cn/20200715203106526.png" alt="在这里插入图片描述"></li>
+<li>哨兵与哨兵间通过订阅和发布的方式交流信息</li>
+</ol>
+</li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/07/13/Redis--RDB%E5%92%8CAOF/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Redis--RDB和AOF
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/07/13/Redis--RDB%E5%92%8CAOF/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Redis--RDB和AOF
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

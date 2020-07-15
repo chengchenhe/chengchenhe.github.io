@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
-    <title>Redis--RDB和AOF-何承宸的个人网站</title>
+    <title>何承宸的个人网站</title>
     
         
             <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/css/adagio.css">
 
 <meta name="generator" content="Hexo 4.2.0"></head>
+
 <body>
     <div class="container-fluid">
     <nav class="nav">
@@ -63,7 +64,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 
-                <li class="nav-item pl-2 pr-2 ">
+                <li class="nav-item pl-2 pr-2 active">
                     <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
                 </li>
                 
@@ -77,105 +78,47 @@
 
     <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        
-        <h1 class="mt-4 article-title page-title">Redis--RDB和AOF</h1>
-        
-        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-07-13</p>
-        
-        <div class="tags">
-            <ul class="tag-list">
-                
-            </ul>
-        </div>
-        
+        <h1 class="mt-4 article-title page-title">ARCHIVE: 2020</h1>
     </div>
 </div>
     <div class="container">
-        <div class="row">
-            <div class="col-md-9 pt-2">
+        <div class="row mt-3">
+            <div class="col-md-9">
+                
                 <div class="row">
-                    <div class="col-12">
-                        <main>
-                            <article class="article-text page-content"><ol>
-<li><strong>提出问题</strong><br> 假设我们要将内存中的数据持久化到硬盘中，而这个过程需要10分钟，该怎么做？<ol>
-<li>使用阻塞的方式：在持久化过程中停止服务直到持久化完毕。这个方法在开发和维护项目时是可行的，但在项目上线后显然不合适</li>
-<li>不使用阻塞的方式：服务正常运行的同时向硬盘中写数据，但这显然会带来数据时点混乱的问题，如下图所示。因此，在Redis中，提供了RDB和AOF两种方式保证持久化时数据的一致性。<br> <img src="https://img-blog.csdnimg.cn/20200713192200428.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-</ol>
-</li>
-<li><strong>RDB持久化方式</strong><ol>
-<li>核心机制<ol>
-<li>linux中子线程间数据相互隔离</li>
-<li>linux中的fork()函数</li>
-<li>linux中的copy on write 写时复制机制</li>
-</ol>
-</li>
-<li>实现原理<ol>
-<li>在持久化开始时，父进程调用fork()函数创建一个用于持久化的子进程，使用另一个服务子进程正常提供服务，持久化子进程仅复制所有指向数据的指针，之后开始往硬盘中持久化数据，当数据修改时，仅修改服务子进程的指针，过程如下图所示<br><img src="https://img-blog.csdnimg.cn/20200713204955104.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200713205106542.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
-</ol>
-</li>
-<li>优点<ol>
-<li>由于几乎所有操作都通过指针来完成，所以RDB方式不仅速度快，而且占用内存小</li>
-<li>RDB持久化数据的方式类似于Java中的序列化，所以恢复数据也相对较快</li>
-</ol>
-</li>
-<li>缺点<ol>
-<li>不支持拉链，只有一个dump.rdb</li>
-<li>丢失数据相对多一些，时点与时点之间窗口数据容易丢失，8得到一个rdb，9点刚要落一个rdb，服务器挂机了</li>
-</ol>
-</li>
-<li>手动触发RDB持久化<ol>
-<li>使用save指令：阻塞式持久化</li>
-<li>使用bgsave指令：上面所讲的持久化方式</li>
-</ol>
-</li>
-<li>配置自动触发RDB持久化<ol>
-<li>vi /etc/redis/6379.conf，找到如下配置<br> <img src="https://img-blog.csdnimg.cn/20200713210559688.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1NDg5ODI0,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><ul>
-<li>服务器在 60 秒之内，对数据库进行了至少 10000 次修改，bgsave执行</li>
-<li>服务器在 300 秒之内，对数据库进行了至少 10 次修改，bgsave执行</li>
-<li>服务器在 900 秒之内，对数据库进行了至少 1 次修改，bgsave执行</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><strong>AOF持久化方式</strong><ol>
-<li>使用类似MySQL中binlog日志的方式记录数据，在 redis 4.0 版本以前和 redis 4.0 版本以后有不同的机制</li>
-<li>4.0版本以前：一直往日志文件中添加数据，在需要重写时，在内核完成重复命令的抵消，并将数据保存到一个新的日志文件中</li>
-<li>4.0版本以后：先通过RDB方式将旧数据写入到AOF日志文件中，执行此过程时会在内存中完成重复命令的抵消，之后再用以前的方式往日志文件中添加数据，即兼顾了RDB的快又保留了AOF的全量！</li>
-<li>优点：保证数据完整，但依旧有可能造成0-4k数据的丢失（取决于配置文件中的flush时机）</li>
-<li>缺点：日志文件体量无限变大；恢复数据较慢</li>
-</ol>
-</li>
-<li><strong>RDB持久化文件与AOF持久化文件都存储在 /var/lib/redis/6379 目录中</strong></li>
-</ol>
-</article>
-                        </main>
-                        
-                        
+                    <div class="col">
+                        <a href="/2020/02/15/Mybatis--SqlSession%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B/" class="index-card-link">
+                            <div class="card-body index-card-box">
+                                <h4 class="card-title text-dark article-title">Mybatis--SqlSession对象创建过程</h4>
+                                <h6 class="card-subtitle mt-2 text-muted">
+                                    By Anonymous
+                                    ; Published on 2020-02-15</h6>
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <div class="row mt-5 mb-5">
-                    <div class="col-12">
-                        <div class="row">
+                <hr class="row">
+                
+                <div class="paginator">
+                    <div class="row">
     <div class="col">
         <nav aria-label="paginator" class="paginator">
             <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/07/15/Redis--AKF%E6%9E%B6%E6%9E%84/"
+                        href="/archives/2020/page/2/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Redis--AKF架构</span>
+                            Newer</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item ">
+                <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/2020/07/13/Redis--bitmap/"
+                        href="/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Redis--bitmap
+                            aria-hidden="true">Older
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -184,19 +127,19 @@
             <ul class="pagination d-md-none justify-content-center">
                 <li class="page-item ">
                     <a class="page-link"
-                        href="/2020/07/15/Redis--AKF%E6%9E%B6%E6%9E%84/"
+                        href="/archives/2020/page/2/"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;
-                            Redis--AKF架构</span>
+                            Newer</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item ">
+                <li class="page-item  disabled ">
                     <a class="page-link"
-                        href="/2020/07/13/Redis--bitmap/"
+                        href="/"
                         aria-label="Next">
                         <span
-                            aria-hidden="true">Redis--bitmap
+                            aria-hidden="true">Older
                             &raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -208,32 +151,145 @@
 
 
 
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div id="vcomment"></div>
-                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="container pt-4 page-sidebar">
-                    
-                    <div class="row">
+            <div class="col-md-3 mt-3">
+                
+    <div class="row">
     <div class="col">
         <h6>APPLAUSE FOR ME</h6>
         <div id="applause-easy"></div>
     </div>
 </div>
-                    
-                    <hr class="row">
-                    <div class="row toc-container">
-                        <div class="col-12">
-                            <h6>NAVIGATION</h6>
-                            
-                        </div>
+    <hr class="row">
+
+
+    <div class="row">
+    <div class="col">
+        <h6>FEATURED TAGS</h6>
+        <div class="tags">
+            
+        </div>
+    </div>
+</div>
+    <hr class="row">
+
+
+    <div class="row">
+    <div class="col">
+        <h6>ABOUT ME</h6>
+        <div class="row">
+            <div class="col">
+                <div class="row justify-content-center">
+                    <div class="col-8 text-center">
+                        <img src="https://s2.ax1x.com/2019/08/22/m0TGVS.png" alt="avatar" class="img-thumbnail">
                     </div>
                 </div>
+                <div class="row mt-2">
+                    <div class="col text-center">
+                        <p class="text-muted">坠欢莫拾，酒痕在衣</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-2 sidebar-socialmedia">
+            <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+    <hr class="row">
+
+
+    <div class="row">
+    <div class="col">
+        <h6>CONTACT</h6>
+        <address>
+            <strong>何承宸</strong><br>
+            南京航天航空大学金城学院 <br/> 软工二班
+        </address>
+    </div>
+</div>
+    <hr class="row">
+
+
+    <div class="row">
+    <div class="col">
+        <h6>ARCHIVES</h6>
+        <div class="archive">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">2019</a></li></ul>
+        </div>
+    </div>
+</div>
+    <hr class="row">
+
+
+    <div class="row">
+    <div class="col">
+        <ul class="list-inline">
+            <h6>FRIENDS</h6>
+            
+            <li class="list-inline-item"><a href="https://hexo.io" target="_blank" rel="noopener"><span class="text-muted">Hexo</span></a>
+            </li>
+            
+            <li class="list-inline-item"><a href="https://github.com" target="_blank" rel="noopener"><span class="text-muted">Github</span></a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+    <hr class="row">
+
             </div>
         </div>
     </div>
@@ -373,19 +429,6 @@ $(document).ready(function() {
 </script>
 
 
-    
-    <script>
-    new Valine({
-        el: "#vcomment",
-        appId: "xxxxxxxxxx",
-        appKey: "xxxxxxxxxx",
-        notify: false,
-        varify: false,
-        avatar: 'identicon',
-        placeholder: "",
-        recordIP: true
-    })
-</script>
-    
 </body>
+
 </html>

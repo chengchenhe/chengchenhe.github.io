@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="http://some.url/to/favicon.ico">
+    <title>Java中字符串的存储方式-何承宸的个人网站</title>
+    
+        
+            <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/academicons/1.8.6/css/academicons.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/font-awesome/5.9.0/css/all.min.css" rel="stylesheet">
+            <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+        
+    
+    
+<link rel="stylesheet" href="/css/adagio.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="container-fluid">
+    <nav class="nav">
+        <div class="collapse navbar-collapse" id="navbar-sm">
+            
+            
+            <div class="navbar-nav">
+                <a href="https://chengchenhe.github.io/" target="_blank" rel="noopener" class="nav-item nav-link">主页</a>
+            </div>
+            
+        </div>
+    </nav>
+</div>
+
+<div class="d-flex d-md-none" style="width: 100%; background-color: #e9ecef">
+    <div class="nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sm"
+            aria-expanded="false" aria-label="Toggle Navigation">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+    </div>
+    <nav class="navbar ml-auto">
+        <a class="navbar-brand" href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+    </nav>
+</div>
+
+
+<div class="container d-none d-md-block my-navbar">
+    <nav class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <a class="navbar-brand " href="/">
+            
+            <img class="logo" src="https://s2.ax1x.com/2019/08/22/m04m6K.png" />
+            
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                
+                <li class="nav-item pl-2 pr-2 ">
+                    <a class="nav-link" href="https://chengchenhe.github.io/" target="_blank" rel="noopener">主页</a>
+                </li>
+                
+            </ul>
+        </div>
+    </nav>
+</div>
+
+
+
+
+    <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        
+        <h1 class="mt-4 article-title page-title">Java中字符串的存储方式</h1>
+        
+        <p class="lead text-gray mt-3">By Anonymous; Published on 2020-08-24</p>
+        
+        <div class="tags">
+            <ul class="tag-list">
+                
+            </ul>
+        </div>
+        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 pt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <main>
+                            <article class="article-text page-content"><p>&emsp;&emsp;Java中的字符串只能位于内存中的两个区域：常量池和Java堆。常量池维护了一个StringTable，它是一个hashtable，以字符串hashcode作为键，字符串引用作为值；Java堆中存储的就是普通的字符串对象。那么如何判断字符串到底位于哪一个区域呢？有以下几种情形。</p>
+<p><strong>情形一</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="string">"123"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>虚拟机在处理字面量”123”时，首先在本地栈中创建字符串”123”，随后对其调用本地方法intern()。intern方法的作用是检查StringTable中是否存在这个字符串，如果有则返回对其的引用；如果没有，则将该字符串存入常量池中，并将其引用添加至StringTable中。 这里值得注意的是，如果该字符串已经存储于Java堆中，那么intern方法将不会再将其拷贝至常量池中，而是直接将其引用添加至StringTable中。</p>
+<p><strong>情形二</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s=<span class="keyword">new</span> String(<span class="string">"123"</span>);</span><br></pre></td></tr></table></figure>
+<p>与上面的直接定义不同，该语句会执行2个操作</p>
+<ol>
+<li>将字面量”123”放入常量池中，将其引用添加至StringTable中（即情形一的操作）</li>
+<li>在Java堆中创建一个字符串对象，里面的值与常量池中的”123”一致，返回引用</li>
+<li>所以，该语句会创建2个对象，一个在堆中一个在常量池中，而引用指向的是堆中的对象</li>
+</ol>
+<p><strong>情形三</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s=<span class="keyword">new</span> String(<span class="string">"1"</span>)+<span class="keyword">new</span> String(<span class="string">"23"</span>);</span><br></pre></td></tr></table></figure>
+<p>这种情况底层等价于以下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">StringBuilder stringBuilder=<span class="keyword">new</span> StringBuilder();</span><br><span class="line">stringBuilder.append(<span class="string">"1"</span>).append(<span class="string">"23"</span>);</span><br><span class="line">String s=stringBuilder.toString();</span><br></pre></td></tr></table></figure>
+<p>这种情况与情形二最大的区别就是它不会在常量池中创建”123”对象，而只是创建一个堆中对象，将引用返回</p>
+<p>介绍完了理论，接下来我们看具体场景</p>
+<p>思考一下，下面的场景分别会输出什么结果？</p>
+<p><strong>场景一</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String s1 = <span class="string">"123"</span>;</span><br><span class="line">String s2 = s1.intern();</span><br><span class="line">System.out.println(s1 == s2);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String s1 = <span class="keyword">new</span> String(<span class="string">"123"</span>);</span><br><span class="line">String s2 = s1.intern();</span><br><span class="line">System.out.println(s1 == s2);</span><br></pre></td></tr></table></figure>
+<p>答案分别是：true，false</p>
+<ol>
+<li>intern()方法在上面具体介绍过，主要是去StringTable中寻找是否存在调用字符串的引用（即确认该字符串是否已在常量池中），如果有则返回，没有则将当前字符串存入常量池中。</li>
+<li>当执行s1.intern()时，会去StringTable中寻找是否存在”123”的引用，而无论是情形一还是情形二，常量池中都会存在”123”，因此上面的s2和下面的s2存放的都是常量池中”123”的引用。但根据情形一，上面的s1存储的是常量池中”123”的引用；而根据情形二，下面的s1存储的是堆中字符串对象的引用。因此，返回的分别是true，false。</li>
+</ol>
+<p><strong>场景二</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String h = <span class="keyword">new</span> String(<span class="string">"hw"</span>);</span><br><span class="line">String h2 = h.intern();</span><br><span class="line">String h1 = <span class="string">"hw"</span>;</span><br><span class="line"></span><br><span class="line">System.out.println(h == h1);</span><br><span class="line">System.out.println(h2 == h1);</span><br><span class="line">System.out.println(h2 == h);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);</span><br><span class="line">String s2 = s.intern();</span><br><span class="line">String s1 = <span class="string">"11"</span>;</span><br><span class="line"></span><br><span class="line">System.out.println(s == s1);</span><br><span class="line">System.out.println(s2 == s1);</span><br><span class="line">System.out.println(s2 == s);</span><br></pre></td></tr></table></figure>
+<p>答案分别是false，true，false  和   true，true，true</p>
+<ol>
+<li>上面的情况<ol>
+<li>h存放的是堆中字符串对象的引用（情形二）</li>
+<li>h2存放的是常量池中字符串对象的引用</li>
+<li>h1存放的也是常量池中字符串对象的引用</li>
+</ol>
+</li>
+<li>下面的情况<ol>
+<li>根据情形三，s存放的是堆中字符串对象的引用，但此时常量池中并没有”11”的字符串对象</li>
+<li>intern()方法发现常量池中不存在对象，所以将调用字符串的引用（s2）存入StringTable中</li>
+<li>因此s，s1，s2得到的都是同一个引用</li>
+</ol>
+</li>
+</ol>
+<p><strong>场景三</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);</span><br><span class="line">String s2 = s.intern();</span><br><span class="line">String s1 = <span class="string">"11"</span>;</span><br><span class="line"></span><br><span class="line">System.out.println(s == s1);</span><br><span class="line">System.out.println(s2 == s1);</span><br><span class="line">System.out.println(s2 == s);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);</span><br><span class="line">String s1 = <span class="string">"11"</span>;</span><br><span class="line">String s2 = s.intern();</span><br><span class="line"></span><br><span class="line">System.out.println(s == s1);</span><br><span class="line">System.out.println(s2 == s1);</span><br><span class="line">System.out.println(s2 == s);</span><br></pre></td></tr></table></figure>
+<p>答案分别是true，true，true 和 false，true，false </p>
+<ol>
+<li>上面的情况：和场景二中的一样</li>
+<li>下面的情况<ol>
+<li>根据情形三，s存放的是堆中字符串对象的引用，但此时常量池中并没有”11”的字符串对象</li>
+<li>定义s1时因为常量池中没有对象，所以在常量池中创建”11”对象，往StringTable中添加引用并返回</li>
+<li>因此根据intern()方法的特性，s2拿到的是s1的引用</li>
+</ol>
+</li>
+</ol>
+<p><strong>参考的文章：</strong></p>
+<ol>
+<li><a href="https://juejin.im/post/5c25983cf265da61715e66cb" target="_blank" rel="noopener">https://juejin.im/post/5c25983cf265da61715e66cb</a></li>
+<li><a href="https://www.zhihu.com/question/267818864/answer/329226635中海纳的回答" target="_blank" rel="noopener">https://www.zhihu.com/question/267818864/answer/329226635中海纳的回答</a></li>
+</ol>
+</article>
+                        </main>
+                        
+                        
+                    </div>
+                </div>
+                <div class="row mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="row">
+    <div class="col">
+        <nav aria-label="paginator" class="paginator">
+            <ul class="pagination d-none d-md-flex pagination-lg justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/07/15/Redis--AKF%E6%9E%B6%E6%9E%84/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Redis--AKF架构
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="pagination d-md-none justify-content-center">
+                <li class="page-item  disabled ">
+                    <a class="page-link"
+                        href=""
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;
+                            No more</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a class="page-link"
+                        href="/2020/07/15/Redis--AKF%E6%9E%B6%E6%9E%84/"
+                        aria-label="Next">
+                        <span
+                            aria-hidden="true">Redis--AKF架构
+                            &raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="vcomment"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="container pt-4 page-sidebar">
+                    
+                    <div class="row">
+    <div class="col">
+        <h6>APPLAUSE FOR ME</h6>
+        <div id="applause-easy"></div>
+    </div>
+</div>
+                    
+                    <hr class="row">
+                    <div class="row toc-container">
+                        <div class="col-12">
+                            <h6>NAVIGATION</h6>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+    <div class="jumbotron jumbotron-fluid mb-0">
+        <div class="container-fluid">
+            <div class="col text-center">
+                <div class="bottom-social">
+                    <div class="row">
+    <div class="col text-center">
+        <ul class="list-inline">
+            
+            <li class="list-inline-item">
+                
+                <a href="https://github.com/chengchenhe" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.facebook.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.pinterest.com/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-pinterest-p fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+            <li class="list-inline-item">
+                
+                <a href="https://www.linkedin.com/in/xxxxx" target="_blank" rel="noopener">
+                    <span class="fa-stack fa-2x icon-link">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fab fa-linkedin-in fa-stack-1x fa-inverse"></i>
+                    </span>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+                </div>
+                <p class="copyright text-muted">
+                    Copyright &copy; Hexo
+                    <br>
+                    Thanks for coming!
+                    <br>
+                    <a href="https://github.com/Hanlin-Dong/hexo-theme-adagio" target="_blank" rel="noopener">Adagio</a> - A <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> theme made with love by
+                    <a href="http://www.hanlindong.com" target="_blank" rel="noopener">Hanlin Dong</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.slim.min.js"></script>
+        <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.bootcss.com/font-awesome/5.9.0/js/all.min.js"></script>
+         
+            <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                    CommonHTML: { linebreaks: { automatic: true } },
+                    "HTML-CSS": { linebreaks: { automatic: true } },
+                    SVG: { linebreaks: { automatic: true } }
+                });
+            </script>
+            <script src='https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+        
+    
+
+
+
+<script src="/js/av.min.js"></script>
+
+
+<script src="/js/valine.min.js"></script>
+
+
+<script src="/js/applause-easy.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    var a = new ApplauseEasy({
+        id: 'applause-easy',
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        img_src: "http://img.hanlindong.com/blog/site/clap.png",
+        img_width: "50px",
+        img_height: "50px"
+    })
+})
+</script>
+
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?123456789";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11111111-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-11111111-1');
+</script>
+
+
+    
+    <script>
+    new Valine({
+        el: "#vcomment",
+        appId: "xxxxxxxxxx",
+        appKey: "xxxxxxxxxx",
+        notify: false,
+        varify: false,
+        avatar: 'identicon',
+        placeholder: "",
+        recordIP: true
+    })
+</script>
+    
+</body>
+</html>

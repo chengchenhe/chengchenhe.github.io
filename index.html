@@ -82,6 +82,28 @@
                     
                     <div class="row">
     <div class="col">
+        <a href="/2020/08/24/Java%E4%B8%AD%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F/" class="index-card-link">
+            <div class="card-body index-card-box">
+                <h4 class="card-title text-dark article-title">Java中字符串的存储方式</h4>
+                <h6 class="card-subtitle mt-2 text-muted">
+                    By 
+                    Anonymous; 
+                    Published on 2020-08-24</h6>
+                <p class="card-text text-dark mt-2 article-text">
+                    &emsp;&emsp;Java中的字符串只能位于内存中的两个区域：常量池和Java堆。常量池维护了一个StringTable，它是一个hashtable，以字符串hashcode作为键，字符串引用作为值；Java堆中存储的就是普通的字符串对象。那么如何判断字符串到底位于哪一个区域呢？有以下几种情形。
+情形一
+1String s = "123";
+
+虚拟机在处理字面量”123”时，首先在本地...
+                </p>
+            </div>
+        </a>
+    </div>
+</div>
+                    <hr class="row">
+                    
+                    <div class="row">
+    <div class="col">
         <a href="/2020/07/15/Redis--AKF%E6%9E%B6%E6%9E%84/" class="index-card-link">
             <div class="card-body index-card-box">
                 <h4 class="card-title text-dark article-title">Redis--AKF架构</h4>
@@ -291,25 +313,6 @@ debug定位到容器创建位置，进入源码
 
 
 磁盘预读（预读的长度一般为页（pag...
-                </p>
-            </div>
-        </a>
-    </div>
-</div>
-                    <hr class="row">
-                    
-                    <div class="row">
-    <div class="col">
-        <a href="/2020/05/11/%E5%A4%9A%E7%BA%BF%E7%A8%8B--%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="index-card-link">
-            <div class="card-body index-card-box">
-                <h4 class="card-title text-dark article-title">多线程--线程池</h4>
-                <h6 class="card-subtitle mt-2 text-muted">
-                    By 
-                    Anonymous; 
-                    Published on 2020-05-11</h6>
-                <p class="card-text text-dark mt-2 article-text">
-                    
-线程池是什么： 线程池（Thread Pool）是一种基于池化思想管理线程的工具，经常出现在多线程服务器中，如MySQL。线程过多会带来额外的开销，其中包括创建销毁线程的开销、调度线程的开销等等，同时也降低了计算机的整体性能。线程池维护多个线程，等待监督管理者分配可并发执行的任务。这种做法，一方面避免了处理任务时创建销毁线程开销的代价，另一方面避免了线程数量膨胀导致的过分调度问题，保证了对...
                 </p>
             </div>
         </a>
